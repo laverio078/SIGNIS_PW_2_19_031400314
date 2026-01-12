@@ -146,6 +146,26 @@ PGPASSWORD=adminpassword psql -h localhost -p 5432 -U admin -d nis2 -c "\copy (S
 
 Il file generato, `report_acn_nis2.csv`, conterrà la mappatura completa di asset, servizi e fornitori.
 
+### Interrogazione dei dati.
+
+E' possibile interrogare lo schema NIS2 del database PostgreSQL tramite interfaccia web (pgAdmin), strumento `Query Tool` o tramite client `psql` disponibile all'interno del container docker dell'RDBMS tramite il comando:
+
+    docker exec -it nis2_postgres psql -U admin -d postgres
+    
+Per facilitare l'interrogazione dei dati sono state predisposte delle query precompilate presenti all'interno della directory `queries` e comprendono:
+
+ - Estrazione degli asset critici o ad alta criticità
+ - Estrazione dell'elenco dei fornitori che supportano i servizi critici e il tipo di contratto in essere
+ - Estrazione delle dipendenze della supply chain e dei fornitori per ogni servizio
+ - Estrazione dei referenti interni (punti di contatto) per i vari servizi
+ - Estrazione dello storico delle modifiche per un asset critico
+
+Per poterle eseguire, è possibile eseguire il client psql interno al container con il comando:
+
+    docker exec -i nis2_postgres psql -U admin -d postgres < *query-file.sql*
+
+O tramite interfaccia **pgAdmin** copiando e incollando il contenuto del file scelto all'interno del `Query Tool` ed eseguendo la query.
+
 ----------
 
 ## 📂 Struttura dell'Elaborato
