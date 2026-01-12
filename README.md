@@ -119,3 +119,48 @@ Inserendo le credenziali fornite in fase di setup.
 -   **Endpoint:** [http://localhost:9000]
     
 -   **Setup:** Al primo accesso è richiesta la definizione di un utente amministratore per la gestione dell'ambiente locale.
+
+## 💾 Gestione Dati e Reporting
+
+Il sistema include procedure predefinite per la gestione del ciclo di vita del dato e la generazione della reportistica di compliance NIS2.
+
+### Inizializzazione e Reset dei Dati
+
+Qualora si rendesse necessario un ripristino dello stato iniziale o un aggiornamento dello schema, si consiglia di utilizzare l'interfaccia a riga di comando `psql`. L'ordine di esecuzione degli script è vincolante:
+
+1.  **Definizione Schema (DDL):** `Creazione Schema-Tabelle-Costraints NIS2_v2.sql`
+    
+2.  **Data Ingestion (DML):** `mock_data4.sql` (Scenario simulato: Agenzia Nazionale Mobilità)
+    
+
+### Estrazione Profilo ACN (CSV)
+
+Al fine di ottemperare agli obblighi di trasmissione dati previsti dall'Agenzia per la Cybersicurezza Nazionale, è stata predisposta una vista dedicata (`vw_acn_profile_csv`). L'estrazione del report in formato interoperabile (CSV) può essere effettuata mediante il seguente comando:
+
+Bash
+
+```
+PGPASSWORD=adminpassword psql -h localhost -p 5432 -U admin -d nis2 -c "\copy (SELECT * FROM nis2.vw_acn_profile_csv) TO 'report_acn_nis2.csv' WITH CSV HEADER DELIMITER ';'"
+
+```
+
+Il file generato, `report_acn_nis2.csv`, conterrà la mappatura completa di asset, servizi e fornitori.
+
+----------
+
+## 📂 Struttura dell'Elaborato
+
+L'organizzazione dei file all'interno del progetto rispetta la seguente tassonomia:
+
+Plaintext
+
+```
+.
+├── docker-compose.yml                # Definizione dichiarativa dell'infrastruttura
+├── servers.json                      # Configurazione per l'auto-provisioning di pgAdmin
+├── Creazione Schema...NIS2_v2.sql    # Script DDL: Schema, Vincoli e Trigger di Audit
+├── mock_data4.sql                    # Script DML: Dataset simulato (Settore Automotive)
+├── Query di ricerca su dati_v2.sql   # Script DML: Estrazione dei dati 
+├── Query export in CSV_v2.sql        # Script DML: Estrazione dei dati secondo lo schema CSV
+└── README.md                         # Documentazione tecnica di progetto
+```
