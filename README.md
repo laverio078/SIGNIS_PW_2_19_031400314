@@ -1,8 +1,51 @@
-Prerequisiti Software e Dipendenze
-Per la corretta esecuzione degli script di inizializzazione, l'ambiente target deve soddisfare i seguenti requisiti minimi:RDBMS: PostgreSQL versione 13 o superiore (compatibilità verificata su v16-alpine).Client Tools: Presenza del client interattivo psql sulla macchina esecutrice.Privilegi Utente: L'utente database utilizzato per il deployment deve possedere i privilegi di SUPERUSER o, in alternativa, il permesso specifico CREATE EXTENSION sul database target, necessario per attivare il modulo uuid-ossp.Connettività: Accesso di rete alla porta TCP/5432 del server database.6.2 Strategia di Versionamento degli ArtefattiGli script SQL sono stati organizzati secondo una logica sequenziale rigorosa, distinguendo tra definizione strutturale (DDL) e manipolazione dati (DML). L'ordine di esecuzione è vincolante per garantire l'integrità referenziale.OrdineArtefatto (File)TipologiaDescrizione Funzionale01Creazione Schema-Tabelle-Costraints NIS2_v2.sqlDDLGenerazione dello schema nis2, tabelle, indici, viste e trigger di audit.02mock_data4.sqlDMLPopolamento delle tabelle con dataset simulato (Scenario: Agenzia Nazionale Mobilità). Richiede l'esecuzione preventiva dello script 01.6.3 Esecuzione del Deployment (CLI)Le operazioni di seguito descritte presuppongono l'utilizzo del terminale di sistema (Bash su Linux/macOS o PowerShell/CMD su Windows).Parametri di configurazione (Esempio):Host: localhostUser: adminDatabase: nis2Fase 1: Inizializzazione dello SchemaIl primo step prevede la creazione delle strutture dati. Si utilizza il flag -f per passare il file sorgente al client psql.Bashpsql -h localhost -p 5432 -U admin -d nis2 -f "Creazione Schema-Tabelle-Costraints NIS2_v2.sql"
+# Prototipazione di Sistema Informativo per la Compliance NIS2 e ACN
 
-Esito atteso: Il sistema restituirà una serie di messaggi di conferma (CREATE SCHEMA, CREATE TABLE, CREATE TRIGGER). L'assenza di messaggi di livello ERROR conferma il successo dell'operazione.Fase 2: Popolamento Dati (Data Ingestion)Successivamente, si procede al caricamento dei dati di test per validare le logiche applicative e i trigger di storico.Bashpsql -h localhost -p 5432 -U admin -d nis2 -f "mock_data4.sql"
+![PostgreSQL](https://img.shields.io/badge/DBMS-PostgreSQL_16-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Orchestrator-Docker_Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Project_Work-orange?style=for-the-badge)
 
-Esito atteso: Visualizzazione dei messaggi di INSERT e della notifica procedurale: NOTICE: Generata organizzazione Automotive PA....6.4 Procedura di Estrazione Reportistica (Compliance ACN)Al fine di soddisfare i requisiti di interoperabilità e reporting previsti dalla normativa, il sistema permette l'estrazione diretta del "Profilo ACN" in formato CSV. Tale operazione sfrutta il meta-comando \copy di PostgreSQL per esportare il risultato della vista vw_acn_profile_csv direttamente sul file system locale, senza richiedere strumenti di terze parti.Comando di Estrazione:Bashpsql -h localhost -p 5432 -U admin -d nis2 -c "\copy (SELECT * FROM nis2.vw_acn_profile_csv) TO 'report_acn_nis2.csv' WITH CSV HEADER DELIMITER ';'"
+Il presente elaborato illustra l'implementazione tecnica di un'architettura database relazionale progettata per supportare gli adempimenti normativi previsti dalla Direttiva UE 2022/2555 (**NIS2**) e dal **Framework Nazionale per la Cybersecurity (ACN)**.
 
-Analisi del comando:-c "...": Esegue una singola istruzione SQL/meta-comando e termina.\copy (...) TO ...: Istruisce il client a leggere i dati dalla vista e scriverli su file locale.WITH CSV HEADER: Genera il file in formato CSV standard includendo l'intestazione delle colonne.DELIMITER ';': Imposta il punto e virgola come separatore, standard de facto per la compatibilità con Excel in ambienti localizzati in italiano.Il file risultante, report_acn_nis2.csv, conterrà l'aggregato completo di organizzazione, servizi critici, asset tecnologici e dipendenze dalla supply chain, pronto per la trasmissione agli organi di controllo.
+Il progetto verte sulla realizzazione di un registro centralizzato per la gestione degli asset, dei servizi essenziali e delle dipendenze dalla catena di approvvigionamento (*Supply Chain*), integrando meccanismi di audit trail e funzionalità di reporting automatizzato.
+
+## 📑 Sommario
+- [Quadro Architetturale](#-quadro-architetturale)
+- [Requisiti di Sistema](#-requisiti-di-sistema)
+- [Metodologia di Deployment](#-metodologia-di-deployment)
+- [Interfacce di Amministrazione](#-interfacce-di-amministrazione)
+- [Gestione Dati e Reporting](#-gestione-dati-e-reporting)
+- [Struttura dell'Elaborato](#-struttura-dellelaborato)
+
+---
+
+## 🏛 Quadro Architetturale
+
+L'infrastruttura tecnologica è stata ingegnerizzata mediante un approccio a microservizi containerizzati, orchestrati tramite **Docker Compose**. L'architettura logica si compone dei seguenti moduli:
+
+| Modulo Funzionale | Componente Tecnologico | Descrizione Tecnica |
+| :--- | :--- | :--- |
+| **Persistence Layer** | **PostgreSQL 16 (Alpine)** | RDBMS oggetto dello studio, configurato con estensione `uuid-ossp` per la gestione delle chiavi primarie distribuite. Esposto sulla porta `5432`. |
+| **Management Interface** | **pgAdmin 4** | Console di amministrazione web-based per l'interrogazione e la manutenzione dello schema dati. Esposta sulla porta `5050`. |
+| **Container Orchestration** | **Portainer CE** | Dashboard per il monitoraggio delle risorse e del ciclo di vita dei container. Esposta sulle porte `9000` (HTTP) e `9443` (HTTPS). |
+
+---
+
+## ⚙ Requisiti di Sistema
+
+Per garantire la corretta esecuzione dell'ambiente simulato, il sistema ospite deve soddisfare i seguenti prerequisiti software:
+
+* **Runtime Environment:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) o Docker Engine (v20.10+).
+* **Orchestrator:** Plugin Docker Compose (v2.0+).
+* **Client SQL (Opzionale):** Utilità `psql` o client grafico (es. DBeaver) per operazioni di debug avanzato.
+
+---
+
+## 🚀 Metodologia di Deployment
+
+La procedura di installazione è stata automatizzata per ridurre al minimo le configurazioni manuali. L'inizializzazione dell'ambiente segue il workflow descritto di seguito.
+
+### 1. Acquisizione dei Sorgenti
+Si proceda alla clonazione del repository contenente gli artefatti di progetto:
+```bash
+git clone [https://github.com/tuo-user/nis2-project-work.git](https://github.com/tuo-user/nis2-project-work.git)
+cd nis2-project-work
