@@ -52,7 +52,7 @@ Procedere alla clonazione, sul sistema di destinazione, del repository contenent
 > bash
 
 ``` 
-git clone [https://github.com/tuo-user/nis2-project-work.git](https://github.com/tuo-user/nis2-project-work.git) 
+git clone https://github.com/laverio078/SIGNIS_PW_2_19_031400314.git
 cd nis2-project-work
 ```
 ---
