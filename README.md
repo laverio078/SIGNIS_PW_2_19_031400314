@@ -172,8 +172,6 @@ O tramite interfaccia **pgAdmin** copiando e incollando il contenuto del file sc
 
 L'organizzazione dei file all'interno del progetto rispetta la seguente tassonomia:
 
-Plaintext
-
 ```
 .
 ├── docker-compose.yml                # Definizione dichiarativa dell'infrastruttura
@@ -183,4 +181,36 @@ Plaintext
 ├── Query di ricerca su dati_v2.sql   # Script DML: Estrazione dei dati 
 ├── Query export in CSV_v2.sql        # Script DML: Estrazione dei dati secondo lo schema CSV
 └── README.md                         # Documentazione tecnica di progetto
+.
+├── Creazione Schema-Tabelle-Costraints NIS2_v2.sql
+├── Diagramma ER DB profili NIS2.jpeg
+├── Diagramma ER DB profili NIS2.pdf
+├── docker-compose.yml
+├── NIS2 Documentation
+│   ├── 1766054735810.jpeg
+│   ├── 290-192A5_01 - Network e information systems.pdf
+│   ├── 290-192A5_02 - Network e information systems.pdf
+│   ├── 290-192A5_03 - Network e information systems.pdf
+│   ├── 297 - Privacy - DORA.zip
+│   ├── ACN_Tassonomia_Cyber_CLEAR.pdf
+│   ├── CELEX_32022L2555_IT_TXT.pdf
+│   ├── DetACN_nis_specifiche_2025_164179_allegato2.pdf
+│   ├── DetACN_nis_specifiche_2025_164179_signed.pdf
+│   └── Guida alla lettura Specifiche di base.pdf
+├── queries
+│   ├── Export CSV
+│   │   ├── Query export in CSV_afi.sql
+│   │   └── Query export in CSV_anmss.sql
+│   ├── Popolazione DB
+│   │   ├── mock_data_anmss.sql
+│   │   └── mock_data_autofisco.sql
+│   └── Ricerca
+│       ├── 1_estrazione_asset_critici.sql
+│       ├── 2_elenco_servizi_critici.sql
+│       ├── 3_elenco_dipendenze_supply_chain.sql
+│       ├── 4_matrice_RACI.sql
+│       └── 5_estrazione_storico_asset.sql
+└── README.md
+
+
 ```
