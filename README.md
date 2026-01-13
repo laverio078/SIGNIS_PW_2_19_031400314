@@ -174,14 +174,6 @@ L'organizzazione dei file all'interno del progetto rispetta la seguente tassonom
 
 ```
 .
-├── docker-compose.yml                # Definizione dichiarativa dell'infrastruttura
-├── servers.json                      # Configurazione per l'auto-provisioning di pgAdmin
-├── Creazione Schema...NIS2_v2.sql    # Script DDL: Schema, Vincoli e Trigger di Audit
-├── mock_data4.sql                    # Script DML: Dataset simulato (Settore Automotive)
-├── Query di ricerca su dati_v2.sql   # Script DML: Estrazione dei dati 
-├── Query export in CSV_v2.sql        # Script DML: Estrazione dei dati secondo lo schema CSV
-└── README.md                         # Documentazione tecnica di progetto
-.
 ├── Creazione Schema-Tabelle-Costraints NIS2_v2.sql
 ├── Diagramma ER DB profili NIS2.jpeg
 ├── Diagramma ER DB profili NIS2.pdf
