@@ -1,0 +1,76 @@
+services:
+  # -----------------------------------------------------------------
+  # SERVIZIO: PostgreSQL
+  # -----------------------------------------------------------------
+  db:
+    image: postgres:16-alpine
+    container_name: nis2_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: adminpassword
+      POSTGRES_DB: postgres               
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Caricamento automatico dello schema all'avvio:
+      - "./Creazione Schema-Tabelle-Costraints NIS2_v2.sql:/docker-entrypoint-initdb.d/init.sql" #attenzione, rimuoverlo dopo il primo run
+    networks:
+      custom_nis2_net:
+        ipv4_address: 10.50.0.3 # Assegna questo IP specifico
+
+  # -----------------------------------------------------------------
+  # SERVIZIO: pgAdmin 4
+  # -----------------------------------------------------------------
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: nis2_pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - custom_nis2_net
+
+  # -----------------------------------------------------------------
+  # SERVIZIO: Portainer
+  # -----------------------------------------------------------------
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: nis2_portainer
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    ports:
+      - "9000:9000"
+      - "9443:9443"
+    networks:
+      - custom_nis2_net
+
+# -----------------------------------------------------------------
+# VOLUMI PERSISTENTI
+# -----------------------------------------------------------------
+volumes:
+  postgres_data:
+  pgadmin_data:
+  portainer_data:
+
+# -----------------------------------------------------------------
+# RETE MANUALE (Per evitare errori di allocazione IP)
+# -----------------------------------------------------------------
+networks:
+  custom_nis2_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.50.0.0/16
