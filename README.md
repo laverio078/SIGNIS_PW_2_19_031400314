@@ -1,6 +1,6 @@
 
 
-# Prototipazione di Sistema Informativo per la Compliance NIS2 e ACN
+# Prototipazione del Sistema di gestione integrata per i profili NIS2 (SIGNIS)
 
 ![PostgreSQL](https://img.shields.io/badge/DBMS-PostgreSQL_16-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Orchestrator-Docker_Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
@@ -182,12 +182,10 @@ L'organizzazione dei file all'interno del progetto rispetta la seguente tassonom
 ├── Diagramma ER DB profili NIS2.jpeg
 ├── Diagramma ER DB profili NIS2.pdf
 ├── docker-compose.yml
-├── NIS2 Documentation
-│   ├── 1766054735810.jpeg
+├── documentazione
 │   ├── 290-192A5_01 - Network e information systems.pdf
 │   ├── 290-192A5_02 - Network e information systems.pdf
 │   ├── 290-192A5_03 - Network e information systems.pdf
-│   ├── 297 - Privacy - DORA.zip
 │   ├── ACN_Tassonomia_Cyber_CLEAR.pdf
 │   ├── CELEX_32022L2555_IT_TXT.pdf
 │   ├── DetACN_nis_specifiche_2025_164179_allegato2.pdf
