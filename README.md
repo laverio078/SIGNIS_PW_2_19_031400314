@@ -1,4 +1,5 @@
 
+
 # Prototipazione di Sistema Informativo per la Compliance NIS2 e ACN
 
 ![PostgreSQL](https://img.shields.io/badge/DBMS-PostgreSQL_16-316192?style=for-the-badge&logo=postgresql&logoColor=white)
@@ -128,9 +129,9 @@ Il sistema include procedure predefinite per la gestione del ciclo di vita del d
 
 Qualora si rendesse necessario un ripristino dello stato iniziale o un aggiornamento dello schema, si consiglia di utilizzare l'interfaccia a riga di comando `psql`. L'ordine di esecuzione degli script è vincolante:
 
-1.  **Definizione Schema (DDL):** `Creazione Schema-Tabelle-Costraints NIS2_v2.sql`
+1.  **Definizione Schema (DDL):** presente all'interno della root di progetto, quale file `Creazione Schema-Tabelle-Costraints NIS2_v2.sql`
     
-2.  **Data Ingestion (DML):** `mock_data4.sql` (Scenario simulato: Agenzia Nazionale Mobilità)
+2.  **Data Ingestion (DML):** presenti all'interno della directory `queries/Popolazione DB` quali files `mock_data_anmss.sql` (Scenario simulato: Agenzia Nazionale Mobilità), `mock_data_autofisco.sql` (Scenario simulato: Auto Fisco Italia S.p.A.) 
     
 
 ### Estrazione Profilo ACN (CSV)
@@ -143,6 +144,9 @@ Bash
 PGPASSWORD=adminpassword psql -h localhost -p 5432 -U admin -d nis2 -c "\copy (SELECT * FROM nis2.vw_acn_profile_csv) TO 'report_acn_nis2.csv' WITH CSV HEADER DELIMITER ';'"
 
 ```
+o eseguendo i file sql predisposti all'interno della directory `queries/Export CSV` con il comando:
+
+    docker exec -i nis2_postgres psql -U admin -d postgres < *query-file.sql*
 
 Il file generato, `report_acn_nis2.csv`, conterrà la mappatura completa di asset, servizi e fornitori.
 
@@ -152,7 +156,7 @@ E' possibile interrogare lo schema NIS2 del database PostgreSQL tramite interfac
 
     docker exec -it nis2_postgres psql -U admin -d postgres
     
-Per facilitare l'interrogazione dei dati sono state predisposte delle query precompilate presenti all'interno della directory `queries` e comprendono:
+Per facilitare l'interrogazione dei dati sono state predisposte delle query precompilate presenti all'interno della directory `queries/Ricerca` e comprendono:
 
  - Estrazione degli asset critici o ad alta criticità
  - Estrazione dell'elenco dei fornitori che supportano i servizi critici e il tipo di contratto in essere
