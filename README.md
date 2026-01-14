@@ -202,10 +202,15 @@ L'organizzazione dei file all'interno del progetto rispetta la seguente tassonom
 │   │   └── mock_data_autofisco.sql
 │   └── Ricerca
 │       ├── 1_estrazione_asset_critici.sql
+│       ├── 1_estrazione_asset_critici_afi.sql
 │       ├── 2_elenco_servizi_critici.sql
+│       ├── 2_elenco_servizi_critici_afi.sql
 │       ├── 3_elenco_dipendenze_supply_chain.sql
+│       ├── 3_elenco_dipendenze_supply_chain_afi.sql
 │       ├── 4_matrice_RACI.sql
-│       └── 5_estrazione_storico_asset.sql
+│       ├── 4_matrice_RACI_afi.sql
+│       ├── 5_estrazione_storico_asset.sql
+│       └── 5_estrazione_storico_asset_afi.sql
 └── README.md
 
 
