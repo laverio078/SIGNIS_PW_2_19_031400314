@@ -58,7 +58,7 @@ cd nis2-project-work
 ---
 
 ### **2. Configurazione dell'ambiente target**
-Il file docker-compose.yml compose, presente nella directory nis2-project-work, contiene le variabili necessarie all'inizializzazione del database Postgres, dell'interfaccia di amministrazione pgAdmin e dell'interfaccia di gestione dello stack, Portainer.
+Il file docker-compose.yml compose, presente nella directory radice, contiene le variabili necessarie all'inizializzazione del database Postgres, dell'interfaccia di amministrazione pgAdmin e dell'interfaccia di gestione dello stack, Portainer.
 
 **Servizio PostgreSQL**
 
