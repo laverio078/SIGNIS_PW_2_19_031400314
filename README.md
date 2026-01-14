@@ -117,7 +117,7 @@ Inserendo le credenziali fornite in fase di setup.
 
 ### Monitoraggio Infrastruttura (Portainer)
 
--   **Endpoint:** [http://localhost:9000]
+-   **Endpoint:** [http://localhost:9443]
     
 -   **Setup:** Al primo accesso è richiesta la definizione di un utente amministratore per la gestione dell'ambiente locale.
 
