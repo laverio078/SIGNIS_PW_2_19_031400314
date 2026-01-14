@@ -146,7 +146,7 @@ PGPASSWORD=adminpassword psql -h localhost -p 5432 -U admin -d postgres -c "\cop
 ```
 o eseguendo i file sql predisposti all'interno della directory `queries/Export CSV` con il comando:
 
-    docker run --rm   --network postgres_custom_nis2_net   -v "$(pwd):/workdir"   -w /workdir   -e PGPASSWORD=adminpassword   postgres:16-alpine   psql -h nis2_postgres -U admin -d postgres -f "*query_export.sql*"
+    docker run --rm   --network signis_pw_2_19_031400314_custom_nis2_net   -v "$(pwd):/workdir"   -w /workdir   -e PGPASSWORD=adminpassword   postgres:16-alpine   psql -h nis2_postgres -U admin -d postgres -f "*query_export.sql*"
 
 Il file generato, `report_acn_nis2.csv`, conterrà la mappatura completa di asset, servizi e fornitori.
 
