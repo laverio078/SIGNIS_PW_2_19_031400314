@@ -103,7 +103,7 @@ L'accesso a quanto attivato dal sistema docker è garantito tramite le seguenti 
 
 ### Console database (pgAdmin 4)
 
- -    **Endpoint:** [http://localhost:5050]
+ -    **Endpoint:** [http://0.0.0.0:5050]
     
  -   **Credenziali di Accesso:** `admin@admin.com` / `root` #se non variate
     
