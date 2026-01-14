@@ -141,7 +141,7 @@ Al fine di ottemperare agli obblighi di trasmissione dati previsti dall'Agenzia 
 Bash
 
 ```
-PGPASSWORD=adminpassword psql -h localhost -p 5432 -U admin -d nis2 -c "\copy (SELECT * FROM nis2.vw_acn_profile_csv) TO 'report_acn_nis2.csv' WITH CSV HEADER DELIMITER ';'"
+PGPASSWORD=adminpassword psql -h localhost -p 5432 -U admin -d postgres -c "\copy (SELECT * FROM nis2.vw_acn_profile_csv) TO 'report_acn_nis2.csv' WITH CSV HEADER DELIMITER ';'"
 
 ```
 o eseguendo i file sql predisposti all'interno della directory `queries/Export CSV` con il comando:
