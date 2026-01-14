@@ -144,11 +144,13 @@ Bash
 PGPASSWORD=adminpassword psql -h localhost -p 5432 -U admin -d postgres -c "\copy (SELECT * FROM nis2.vw_acn_profile_csv) TO 'report_acn_nis2.csv' WITH CSV HEADER DELIMITER ';'"
 
 ```
+Il file generato, `report_acn_nis2.csv`, conterrà la mappatura completa di asset, servizi e fornitori per tutte le organizzazioni presenti.
+
 o eseguendo i file sql predisposti all'interno della directory `queries/Export CSV` con il comando:
 
     docker run --rm   --network signis_pw_2_19_031400314_custom_nis2_net   -v "$(pwd):/workdir"   -w /workdir   -e PGPASSWORD=adminpassword   postgres:16-alpine   psql -h nis2_postgres -U admin -d postgres -f "*query_export.sql*"
 
-Il file generato, `report_acn_nis2.csv`, conterrà la mappatura completa di asset, servizi e fornitori.
+Il file generato, `acn_profile_anmss.csv`, conterrà la mappatura completa di asset, servizi e fornitori per l'organizzazione ANMSS , mentre il file `acn_profile_AFI.csv`  conterrà quelli dell'AFI (Auto Fisco Italia).
 
 ### Interrogazione dei dati.
 
