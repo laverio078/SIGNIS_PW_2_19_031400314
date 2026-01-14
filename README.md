@@ -95,7 +95,15 @@ docker compose up -d
 
 Questo comando avvierà il demone docker seguendo la configurazione descritta nel file docker-compose.yml.
 
-**Nota tecnica**: Durante la fase di avvio, il container PostgreSQL eseguirà automagicamente gli script SQL mappati nella directory `/docker-entrypoint-initdb.d/`, garantendo la creazione dello schema senza doverlo fare a posteriori.
+**Nota tecnica**: Durante la fase di avvio, il container PostgreSQL eseguirà automagicamente gli script SQL mappati nella directory `/docker-entrypoint-initdb.d/`, garantendo la creazione dello schema senza doverlo fare a posteriori. Qualora sia necessario far ripartire lo stack, senza cancellare i dati esistenti, si dovrà rimuovere dal `docker-file.yml` la riga numero 18, `- "./Creazione Schema-Tabelle-Costraints NIS2_v2.sql:/docker-entrypoint-initdb.d/init.sql"`
+
+Per disattivare lo stack rimuovendo tutti i dati esistenti sarà sufficiente eseguire il comando:
+
+    docker compose down -v
+
+altrimenti sarà sufficiente il comando:
+
+    docker compose down
 
 ## 🖥 **Interfacce di Amministrazione** 
 
