@@ -2,30 +2,38 @@
 /* Schema per Project Work NIS2, traccia 2.19: Registro asset/servizi/dipendenze */
 /* ============================================================================= */
 
-/* La nomenclatura di campi, tabelle, viste e indici viene realizzata in lingua inglese per facilitarne la portabilità in altri contesti essendo la normativa NIS2 di competenza europea */
+/* La nomenclatura scelta per campi, tabelle, viste e indici è stata realizzata in lingua inglese per facilitarne la portabilità in altri contesti */
+/* essendo la normativa NIS2 di competenza europea anche se l'implementazione di ACN ne rappresenta una specifica interpretazione */
 
-/* Pre-requisiti: estensione uuid-ossp, normalmente non attiva. Nota per un eventuale porting: su altri database come SQL Server o MySQL le funzionalità di id univoco sono già presenti e hanno altri nomi.  */
+/* Pre-requisiti di funzionamento: estensione uuid-ossp, normalmente non attiva. */
+/* Nota per un eventuale porting: su altri database come SQL Server o MySQL le funzionalità di id univoco sono già presenti */
+/* e hanno altri nomi. Sarà quindi necessario adattare la struttura qualora si volesse implementarlo altrove */
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-/* Creazione SCHEMA, consente di mantenere separati i dati dell'applicazione da quelli di funzionamento del db, personalmente preferisco l'approccio MySQL-like a quello Oracle-like' */
+/* Creazione SCHEMA, consente di mantenere separati i dati dell'applicazione da quelli di funzionamento del db, come sistemista */
+/* preferisco l'approccio MySQL-like (db separati) a quello Oracle-like (schema separati) anche se in ambito DBA è quello più diffuso. */
 CREATE SCHEMA IF NOT EXISTS nis2;
 SET search_path = nis2, public;
 
-/* Per ogni tabella si definisce una chiave primaria contenente un uuid completamente casuale di 128-bit */
-/* 1) Creazione della tabella "organization"", contiene i campi relativi all'organizzazione funzionale es. Una o più società per cui si crea l'assessment NIS2 ' */
+/* Per ogni tabella definita si usa una chiave primaria contenente un uuid completamente casuale di 128-bit per identificare il record in modo univoco, */
+/* il dettaglio del data dictonary, della struttura e del perchè è stata definita questa struttura è presente all'interno del PDF di progetto. */
+
+/* Definizione della tabella "organization"", contiene i campi relativi all'organizzazione funzionale a cui si far riferimento  come, ad esempio, una o */
+/* più società per cui si crea l'assessment NIS2. */
+
 CREATE TABLE organization (
     organization_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL,                                 /* Nome dell'organizzazione */ 
-    vat varchar(13),                                           /* partita IVA o identificativo */
+    vat varchar(13),                                    /* partita IVA o identificativo */
     address TEXT,                                       /* sede sociale. Nel caso di ditte individuale - se ce ne fossero - si usa la residenza del titolare */
-    contact_email varchar(100),                                 /* email di contatto */
-    contact_phone varchar(20),                                 /* telefono */
+    contact_email varchar(100),                         /* email di contatto */
+    contact_phone varchar(20),                          /* telefono */
     created_at timestamptz DEFAULT now()                /* timestamp di definizione del record */
 );
 
 CREATE UNIQUE INDEX ux_org_name ON organization( name );   /* si definisce un indice univoco sulla colonna "name" per evitare duplicazioni */
 
-/* 2) Creazione della tabella "vendor", corrisponde all'elenco dei fornitori (in NIS2, terze parti) */
+/* Definizione della tabella "vendor", corrisponde all'elenco dei fornitori (in NIS2, terze parti) */
 CREATE TABLE vendor (
     vendor_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),  
     name TEXT NOT NULL,                                 /* nome del fornitore o ragione sociale */
@@ -38,10 +46,10 @@ CREATE TABLE vendor (
 
 CREATE INDEX idx_vendor_name ON vendor(name);
 
-/* 3) Creazione della tabella "person", corrispondente al "punto di contatto" (o referente interno) della normativa NIS2 ) */
+/* Definizione della tabella "person", corrispondente al "punto di contatto" (o referente interno) della normativa NIS2 */
 CREATE TABLE person (
     person_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    organization_id UUID REFERENCES organization(organization_id) ON DELETE CASCADE,    /* predispongo una reference per la cancellazione a cascata dei dati qualora venisse cancellato il record padre nella tabella "organization" */
+    organization_id UUID REFERENCES organization(organization_id) ON DELETE CASCADE,    /* reference per la cancellazione a cascata dei dati qualora venisse cancellato il record padre nella tabella "organization" */
     given_name varchar(60) NOT NULL,                           /* nome del contatto */
     family_name varchar(60),                                   /* cognome */
     email varchar(100),                                         /* email */
@@ -49,9 +57,10 @@ CREATE TABLE person (
     metadata jsonb DEFAULT '{}'::jsonb,                 /* eventuali metadati necessari per l'identificazione o dettagli sulla tipologia di contatto */
     created_at timestamptz DEFAULT now()                /* timestamp di definizione del record */
 );
-CREATE INDEX idx_person_email ON person(email);         /* definizione di un indice sul campo email per il recupero rapido del dato*/
 
-/* 4) Creazione della tabella "ruolo" recante la definizione dei ruoli ricoperti dai "punti di contatto" */
+CREATE INDEX idx_person_email ON person(email);         /* definizione di un indice sul campo email per il recupero rapido del dato */
+
+/* Definizione della tabella "ruolo" recante la definizione dei ruoli ricoperti dai "punti di contatto" */
 CREATE TABLE role (
     role_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     code varchar(10) NOT NULL,                                 /* Per esempio CTO, CISO, Owner */
@@ -60,7 +69,7 @@ CREATE TABLE role (
     UNIQUE(code)                                        /* Si definisce il valore del campo "code" come univoco */
 );
 
-/* 5) Creazione della tabella "asset", che contiene l'oggetto di rischio */
+/* Definizione della tabella "asset", che contiene l'oggetto di rischio */
 CREATE TABLE asset (
     asset_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     organization_id UUID REFERENCES organization(organization_id) ON DELETE CASCADE,  /* predispongo una reference per la cancellazione a cascata dei dati qualora venisse cancellato il record padre nella tabella "organization" */
@@ -68,7 +77,7 @@ CREATE TABLE asset (
     name varchar(40) NOT NULL,                                 /* nome dell'oggetto' */
     identifier varchar(40),                                    /* Identificatore specifico, per esempio tag, hostname, seriale */
     criticality SMALLINT DEFAULT 3,                     /* 1 (basso) .. 5 (critico), come predefinito si usa un valore intermedio, 3 */
-    lifecycle_status varchar(20) DEFAULT 'active',             /* posizione nel ciclo di vita dell'oggetto, di default si usa active, gli altri valori validi possono essere: "off", "on hold", "decommissioned" */
+    lifecycle_status varchar(2DEFAULT 'active',             /* posizione nel ciclo di vita dell'oggetto, di default si usa active, gli altri valori validi possono essere: "off", "on hold", "decommissioned" */
     metadata jsonb DEFAULT '{}'::jsonb,                 /* Eventuali metadati aggiuntivi specifici dell'oggetto, per esempio, riferimento all'uso che se ne fa */
     created_by UUID REFERENCES person(person_id),       /* Riferimento all'uuid del responsabile */
     created_at timestamptz DEFAULT now()                /* timestamp di definizione del record */
@@ -78,7 +87,7 @@ CREATE INDEX idx_asset_org ON asset(organization_id);   /* Indice sull'indentifi
 CREATE INDEX idx_asset_type ON asset(asset_type);       /* Indice sulla tipologia */
 CREATE UNIQUE INDEX ux_asset_org_identifier ON asset(organization_id, identifier) WHERE identifier IS NOT NULL; /* Indice univoco sulla coppia valori (orgId e identificatore specifico) */
 
-/* 6) Creazione della tabella relativa ai servizi  */
+/* Definizione della tabella relativa ai servizi  */
 CREATE TABLE service (
     service_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     organization_id UUID REFERENCES organization(organization_id) ON DELETE CASCADE, /* predispongo una reference per la cancellazione a cascata dei dati qualora venisse cancellato il record padre nella tabella "organization" */
@@ -94,7 +103,7 @@ CREATE TABLE service (
 CREATE INDEX idx_service_org ON service(organization_id);    /* Indice sull'indentificativo organization per il recupero rapido del dato */
 CREATE UNIQUE INDEX ux_service_org_name ON service(organization_id, name);  /* Indice univoco sull'orgId */
 
-/* 7) Creazione della tabella di associazione uno-a-molti tra servizio <-> asset (un servizio usa più asset) */
+/* Definizione della tabella di associazione uno-a-molti tra servizio <-> asset (un servizio usa più asset) */
 CREATE TABLE service_asset (
     service_id UUID REFERENCES service(service_id) ON DELETE CASCADE,    /* predispongo una reference per la cancellazione a cascata dei dati qualora venisse cancellato il record padre nella tabella "service" */
     asset_id   UUID REFERENCES asset(asset_id) ON DELETE CASCADE,        /* predispongo una reference per la cancellazione a cascata dei dati qualora venisse cancellato il record padre nella tabella "asset" */
@@ -103,7 +112,7 @@ CREATE TABLE service_asset (
 );
 CREATE INDEX idx_service_asset_asset ON service_asset(asset_id);        /* Definisco un indice sul campo asset_id */
 
-/* 8) Creazione della tabella di dipendenza tra servizio e fornitore  */
+/* Definizione della tabella di dipendenza tra servizio e fornitore  */
 CREATE TABLE dependency (
     dependency_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),          
     service_id UUID REFERENCES service(service_id) ON DELETE CASCADE,    /* predispongo una reference per la cancellazione a cascata dei dati qualora venisse cancellato il record padre nella tabella "service" */ 
@@ -118,7 +127,7 @@ CREATE TABLE dependency (
 CREATE INDEX idx_dependency_service ON dependency(service_id);              /* Definisco un indice sul campo service_id */
 CREATE INDEX idx_dependency_vendor ON dependency(vendor_id);                /* Definisco un indice sul campo vendor_id */
 
-/* 9) Creazione della tabella che definisce la matrice di responsabilità  (persona/ruolo su risorsa) */
+/* Definizione della tabella che definisce la matrice di responsabilità  (persona/ruolo su risorsa) */
 CREATE TABLE responsability (
     responsability_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     organization_id UUID REFERENCES organization(organization_id) ON DELETE CASCADE, /* predispongo una reference per la cancellazione a cascata dei dati qualora venisse cancellato il record padre nella tabella "organization" */ 
@@ -135,27 +144,54 @@ CREATE TABLE responsability (
 CREATE INDEX idx_responsability_target ON responsability(target_type, target_id);    /* Definisco un indice composto dalla coppia (tipologia, identificativo) */
 CREATE INDEX idx_responsability_person ON responsability(person_id);                 /* Definisco un indice sul campo person_id */
 
-/* 10) VERSIONING / STORICO GENERICO */
-/* (approccio semplice: tabelle *_history che contengono snapshot prima di UPDATE/DELETE). E' un salvataggio puramente applicativo, il salvataggio dei dati in caso di upgrade di sistema, */
-/* aggiornamento dell'applicazione o altro, deve sempre avvenire con gli strumenti messi a disposizione dal db server come pg_dump o di terze parti come Percona Backup */
+/* Definizione della tabella relativa al catalogo dei controlli ACN/NIST */
+CREATE TABLE acn_subcategory (
+    code VARCHAR(20) PRIMARY KEY,                                           /* Codice univoco (es. ID.AM-1) */
+    function_name VARCHAR(20) NOT NULL,                                     /* Funzione: IDENTIFY, PROTECT, DETECT, RESPOND, RECOVER */
+    category_name VARCHAR(100),                                             /* Categoria: Asset Management, Access Control, etc. */
+    description TEXT,                                                       /* Descrizione del controllo richiesto */
+    created_at timestamptz DEFAULT now()
+);
 
-/* Creazione della tabella che contiene le variazioni effettuate sugli asset */
+/* Definizione del profilo di sicurezza: abbina l'Asset al controllo e ne misura il livello (Tier) */
+CREATE TABLE security_profile (
+    profile_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    asset_id UUID REFERENCES asset(asset_id) ON DELETE CASCADE,
+    subcategory_code VARCHAR(20) REFERENCES acn_subcategory(code),
+    implementation_tier_current VARCHAR(20),
+    status_current VARCHAR(20),
+    implementation_tier_target VARCHAR(20) DEFAULT 'Tier 3',                    /* Tier di default impostato a 3. */
+    gap_analysis TEXT,                                                          /* Note sulle mancanze rilevate per raggiungere il target */
+    updated_at TIMESTAMPTZ DEFAULT now(),
+    UNIQUE(asset_id, subcategory_code)                                           /* Vincolo: Un asset può avere un solo record per ogni specifico controllo (evita duplicati) */
+);
+
+/* Indici per velocizzare le query di compliance */
+CREATE INDEX idx_sec_profile_asset ON security_profile(asset_id);
+CREATE INDEX idx_sec_profile_code ON security_profile(subcategory_code);
+
+/* STORICIZZAZIONE */
+/* E' un salvataggio puramente applicativo attivato dai trigger in fase di modifica dei dati. Il salvataggio dei dati in caso di upgrade di sistema, */
+/* aggiornamento dell'applicazione o altro, dovrà sempre avvenire con gli strumenti messi a disposizione dal db server come pg_dump */
+/* o di terze parti come Percona Backup */
+
+/* Definizione della tabella che contiene le variazioni effettuate sugli asset */
 CREATE TABLE asset_history (
     history_id BIGSERIAL PRIMARY KEY,
     asset_id UUID,                                                      /* UUID dell'asset d'origine */
     organization_id UUID,                                               /* UUID dell'organizzazione di origine */
-    asset_type varchar(60),                                                    /* tipologia dell'asset - vedi tabella "assets" */
-    name varchar(40),                                                          /* nome dell'asset - vedi tabella "assets" */
-    identifier varchar(40),                                                    /* identificatore dell'asset - vedi tabella "assets" */
+    asset_type varchar(60),                                             /* tipologia dell'asset - vedi tabella "assets" */
+    name varchar(40),                                                   /* nome dell'asset - vedi tabella "assets" */
+    identifier varchar(40),                                             /* identificatore dell'asset - vedi tabella "assets" */
     criticality SMALLINT,                                               /* criticità dell'asset - vedi tabella "assets" */
-    lifecycle_status varchar(20),                                              /* stato dell'asset relativamente al suo ciclo di vita - vedi tabella "assets" */
+    lifecycle_status varchar(20),                                       /* stato dell'asset relativamente al suo ciclo di vita - vedi tabella "assets" */
     metadata jsonb,                                                     /* Eventuali metadati aggiuntivi specifici, come commenti  */
     changed_by UUID,                                                    /* identificatore di chi ha effettuato la variazione - vedi tabella "person" */
     operation CHAR(1) NOT NULL,                                         /* Attività svolta su i dati 'I'nsert,'U'pdate,'D'elete */
     changed_at timestamptz DEFAULT now()                                /* timestamp di definizione del record, in questo caso di cambio del dato */
 );
 
-/* Creazione della tabella che contiene le variazioni effettuate su i servizi  */
+/* Definizione della tabella che contiene le variazioni effettuate su i servizi  */
 CREATE TABLE service_history (
     history_id BIGSERIAL PRIMARY KEY,
     service_id UUID,                                                    /* UUID del servizio di origine */
@@ -171,7 +207,7 @@ CREATE TABLE service_history (
     changed_at timestamptz DEFAULT now()                                /* timestamp di definizione del record, in questo caso di cambio del dato */
 );
 
-/* Creazione della tabella che contiene le variazioni effettuate sulle dipendenze */
+/* Definizione della tabella che contiene le variazioni effettuate sulle dipendenze */
 CREATE TABLE dependency_history (
     history_id BIGSERIAL PRIMARY KEY,
     dependency_id UUID,                                                 /* UUID della dipendenza di origine */
@@ -187,7 +223,7 @@ CREATE TABLE dependency_history (
     changed_at timestamptz DEFAULT now()                                /* timestamp di definizione del record, in questo caso di cambio del dato */
 );
 
-/* Creazione della tabella che contiene le variazioni effettuate sulle responsabilità */
+/* Definizione della tabella che contiene le variazioni effettuate sulle responsabilità */
 CREATE TABLE responsability_history (
     history_id BIGSERIAL PRIMARY KEY,
     responsability_id UUID,                                             /* UUID della responsabilità di origine */
@@ -204,7 +240,22 @@ CREATE TABLE responsability_history (
     changed_at timestamptz DEFAULT now()                                /* timestamp di definizione del record, in questo caso di cambio del dato */
 );
 
-/* 11) Definizione dei triggers che consentono la registrazione degli eventi di UPDATE/DELETE per le tabelle chiave */
+/* Definizione della tabella che contiene lo storico dei Profili di Sicurezza (Trend e Audit) */
+CREATE TABLE security_profile_history (
+    history_id BIGSERIAL PRIMARY KEY,
+    profile_id UUID,                                                    /* UUID del record originale */
+    asset_id UUID,                                                      /* Asset di riferimento */
+    subcategory_code VARCHAR(20),                                       /* Codice del controllo (es. ID.AM-1) */
+    implementation_tier_current VARCHAR(20),                            /* Tier registrato al momento della modifica */
+    status_current VARCHAR(20),                                         /* Stato (Implementato/Parziale/ecc) */
+    implementation_tier_target VARCHAR(20),                             /* Tier obiettivo */
+    gap_analysis TEXT,                                                  /* Analisi del gap */
+    changed_by UUID,                                                    /* Chi ha fatto la modifica */
+    operation CHAR(1) NOT NULL,                                         /* Attività svolta su i dati 'I'nsert,'U'pdate,'D'elete */
+    changed_at TIMESTAMPTZ DEFAULT now()                                /* Quando è avvenuta la modifica */
+);
+
+/* Definizione dei triggers che consentono la registrazione degli eventi di UPDATE/DELETE per le tabelle chiave */
 
 /* Definizione della funzione che gestisce l'evento di UPDATE/DELETE/INSERT sulla tabella asset, salvando i dati variati sulla tabella asset_history' */
 CREATE OR REPLACE FUNCTION fn_asset_audit() RETURNS trigger AS $$
@@ -302,15 +353,39 @@ CREATE TRIGGER trg_responsability_audit
 AFTER INSERT OR UPDATE OR DELETE ON responsability
 FOR EACH ROW EXECUTE PROCEDURE fn_responsability_audit();
 
-/* Nota: current_setting('nis2.current_user_id') è opzionale. Prima di eseguire operazioni che vogliamo tracciare, possiamo settare: */
-/* SET LOCAL nis2.current_user_id = '00000000-0000-0000-0000-000000000000'; */
+/* Definizione della funzione di audit per il Security Profile */
+CREATE OR REPLACE FUNCTION fn_security_profile_audit() RETURNS trigger AS $$
+BEGIN
+    IF TG_OP = 'UPDATE' THEN
+        INSERT INTO security_profile_history(profile_id, asset_id, subcategory_code, implementation_tier_current, status_current, implementation_tier_target, gap_analysis, changed_by, operation, changed_at)
+        VALUES (OLD.profile_id, OLD.asset_id, OLD.subcategory_code, OLD.implementation_tier_current, OLD.status_current, OLD.implementation_tier_target, OLD.gap_analysis, current_setting('nis2.current_user_id', true)::uuid, 'U', now());
+        RETURN NEW;
+    ELSIF TG_OP = 'DELETE' THEN
+        INSERT INTO security_profile_history(profile_id, asset_id, subcategory_code, implementation_tier_current, status_current, implementation_tier_target, gap_analysis, changed_by, operation, changed_at)
+        VALUES (OLD.profile_id, OLD.asset_id, OLD.subcategory_code, OLD.implementation_tier_current, OLD.status_current, OLD.implementation_tier_target, OLD.gap_analysis, current_setting('nis2.current_user_id', true)::uuid, 'D', now());
+        RETURN OLD;
+    ELSIF TG_OP = 'INSERT' THEN
+        INSERT INTO security_profile_history(profile_id, asset_id, subcategory_code, implementation_tier_current, status_current, implementation_tier_target, gap_analysis, changed_by, operation, changed_at)
+        VALUES (NEW.profile_id, NEW.asset_id, NEW.subcategory_code, NEW.implementation_tier_current, NEW.status_current, NEW.implementation_tier_target, NEW.gap_analysis, current_setting('nis2.current_user_id', true)::uuid, 'I', now());
+        RETURN NEW;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
 
-/* 12) Definizione dei costraint (vincoli) aggiuntivi e degli eventuali controlli */
+CREATE TRIGGER trg_security_profile_audit
+AFTER INSERT OR UPDATE OR DELETE ON security_profile
+FOR EACH ROW EXECUTE PROCEDURE fn_security_profile_audit();
+
+/* Definizione dei costraint (vincoli) aggiuntivi e degli eventuali controlli */
 ALTER TABLE asset ADD CONSTRAINT chk_asset_criticality CHECK (criticality >= 1 AND criticality <= 5);
 ALTER TABLE service ADD CONSTRAINT chk_service_criticality CHECK (criticality >= 1 AND criticality <= 5);
 ALTER TABLE dependency ADD CONSTRAINT chk_dependency_criticality CHECK (criticality >= 1 AND criticality <= 5);
+ALTER TABLE acn_subcategory ADD CONSTRAINT chk_function_name CHECK (function_name IN ('IDENTIFY', 'PROTECT', 'DETECT', 'RESPOND', 'RECOVER'));
+ALTER TABLE security_profile ADD CONSTRAINT chk_implementation_tier_current CHECK (implementation_tier_current IN ('Tier 1', 'Tier 2', 'Tier 3', 'Tier 4', 'Non Applicabile'));
+ALTER TABLE security_profile ADD CONSTRAINT chk_status_current  CHECK (status_current IN ('Implementato', 'Parziale', 'Non Implementato'));
 
-/* 13) Definizione della vista che serve a generare la porzione di profilo ACN (CSV) richiesto dal progetto */
+/* Definizione della vista che serve a generare la porzione di profilo ACN (CSV) */
 /* è una vista che unisce: organizzazione -> servizi critici -> asset usati -> dipendenze -> punti di contatto/responsabili */
 CREATE OR REPLACE VIEW vw_acn_profile AS
 SELECT
@@ -319,44 +394,25 @@ SELECT
   s.service_id,
   s.name AS service_name,
   s.criticality AS service_criticality,
-  s.description AS service_description,
-  /* assets aggregated as json array */
   (SELECT jsonb_agg(jsonb_build_object(
-          'asset_id', a.asset_id,
           'asset_name', a.name,
-          'asset_type', a.asset_type,
-          'identifier', a.identifier,
-          'criticality', a.criticality
+          'type', a.asset_type,
+          'criticality', a.criticality,
+          'security_controls', (
+              SELECT jsonb_agg(jsonb_build_object(
+                  'control_code', sp.subcategory_code,
+                  'tier_current', sp.implementation_tier_current,
+                  'status', sp.status_current,
+                  'gap', sp.gap_analysis
+              ))
+              FROM security_profile sp
+              WHERE sp.asset_id = a.asset_id
+          )
       ))
     FROM service_asset sa
     JOIN asset a ON a.asset_id = sa.asset_id
     WHERE sa.service_id = s.service_id
-  ) AS assets,
-  /* dependencies aggregated */
-  (SELECT jsonb_agg(jsonb_build_object(
-          'dependency_id', d.dependency_id,
-          'vendor_name', v.name,
-          'type', d.dependency_type,
-          'sla', d.sla_reference,
-          'criticality', d.criticality
-      ))
-    FROM dependency d
-    LEFT JOIN vendor v ON v.vendor_id = d.vendor_id
-    WHERE d.service_id = s.service_id
-  ) AS dependencies,
-  /* responsible persons for the service */
-  (SELECT jsonb_agg(jsonb_build_object(
-        'person_id', p.person_id,
-        'name', concat(p.given_name, ' ', COALESCE(p.family_name,'')),
-        'email', p.email,
-        'phone', p.phone,
-        'role', r.code
-    ))
-   FROM responsability resp
-   LEFT JOIN person p ON p.person_id = resp.person_id
-   LEFT JOIN role r ON r.role_id = resp.role_id
-   WHERE resp.target_type = 'service' AND resp.target_id = s.service_id
-  ) AS contacts,
+  ) AS assets_security_posture,
   s.metadata
 FROM organization o
 JOIN service s ON s.organization_id = o.organization_id;
@@ -364,25 +420,19 @@ JOIN service s ON s.organization_id = o.organization_id;
 /* Definizione della vista che produce un un record piatto esportabile in CSV */
 CREATE OR REPLACE VIEW vw_acn_profile_csv AS
 SELECT
-  o.organization_id::text AS organization_id,
-  o.name AS organization_name,
-  s.service_id::text AS service_id,
-  s.name AS service_name,
-  s.criticality::text AS service_criticality,
-  COALESCE(
-    (SELECT string_agg(a.name || ' (' || a.asset_type || ')', '; ')
-     FROM service_asset sa JOIN asset a ON a.asset_id = sa.asset_id
-     WHERE sa.service_id = s.service_id
-    ), '') AS assets_list,
-  COALESCE(
-    (SELECT string_agg(v.name || ' [' || COALESCE(d.dependency_type,'') || ']', '; ')
-     FROM dependency d LEFT JOIN vendor v ON v.vendor_id = d.vendor_id
-     WHERE d.service_id = s.service_id
-    ), '') AS dependencies_list,
-  COALESCE(
-    (SELECT string_agg(concat(p.given_name,' ',COALESCE(p.family_name,''),' <',COALESCE(p.email,''),'>'), '; ')
-     FROM responsability resp LEFT JOIN person p ON p.person_id = resp.person_id
-     WHERE resp.target_type='service' AND resp.target_id = s.service_id
-    ), '') AS contacts_list
+  o.name AS Organization,
+  s.name AS Service,
+  a.name AS Asset,
+  a.asset_type AS Asset_Type,
+  sp.subcategory_code AS ACN_Control_Code,
+  sub.description AS Control_Description,
+  sp.implementation_tier_current AS Current_Tier,
+  sp.status_current AS Status,
+  sp.gap_analysis AS Gap_To_Target
 FROM organization o
-JOIN service s ON s.organization_id = o.organization_id;
+JOIN service s ON s.organization_id = o.organization_id
+JOIN service_asset sa ON sa.service_id = s.service_id
+JOIN asset a ON a.asset_id = sa.asset_id
+LEFT JOIN security_profile sp ON sp.asset_id = a.asset_id                   /* LEFT JOIN l'asset deve essere presnete anche se non si hanno ancora controlli mappati */
+LEFT JOIN acn_subcategory sub ON sub.code = sp.subcategory_code
+ORDER BY o.name, s.name, a.name, sp.subcategory_code;
