@@ -6,7 +6,7 @@
 ![Docker](https://img.shields.io/badge/Orchestrator-Docker_Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Status](https://img.shields.io/badge/Status-Project_Work-orange?style=for-the-badge)
 
-Il presente elaborato illustra l'implementazione tecnica di un'architettura database relazionale progettata per supportare gli adempimenti normativi previsti dalla Direttiva UE 2022/2555 (**NIS2**) e dal **Framework Nazionale per la Cybersecurity (ACN)**.
+Il presente elaborato illustra l'implementazione tecnica di un'architettura database relazionale progettata per supportare gli adempimenti normativi previsti dalla Direttiva UE 2022/2555 (**NIS2**) e dal **Framework Nazionale per la Cybersecurity (CIS/CINI)**.
 
 Il progetto verte sulla realizzazione di un registro centralizzato per la gestione degli asset, dei servizi essenziali e delle dipendenze dalla catena di approvvigionamento (*Supply Chain*), integrando meccanismi di audit trail e funzionalità di reporting automatizzato.
 
