@@ -61,6 +61,7 @@ cd SIGNIS_PW_2_19_031400314
 
 ### **2. Configurazione dell'ambiente target**
 Il file docker-compose.yml compose, presente nella directory SIGNIS_PW_2_19_031400314, contiene le variabili necessarie all'inizializzazione del database Postgres, dell'interfaccia di amministrazione pgAdmin e dell'interfaccia di gestione dello stack, Portainer. 
+
 **ATTENZIONE**: è stata impostata una network specifica per il db server in modo da superare il limite del docker server nella gestione automatica delle network che su molte installazioni impedisce lo start. Se la network specificata non è compatibile o da errori, variarla a proprio piacimento.
 
 **Servizio PostgreSQL**
@@ -263,7 +264,7 @@ PGPASSWORD=adminpassword psql -h localhost -p 5432 -U admin -d postgres < *query
 > bash
 
 ```
-    sudo docker exec -i nis2_postgres psql -U admin -d postgres < *query-file.sql*
+sudo docker exec -i nis2_postgres psql -U admin -d postgres < *query-file.sql*
 ```
 
 O tramite l'interfaccia **pgAdmin** copiando e incollando il contenuto del file scelto all'interno del `Query Tool` ed eseguendo la query scelta.
