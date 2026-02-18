@@ -6,7 +6,7 @@
 ![Docker](https://img.shields.io/badge/Orchestrator-Docker_Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Status](https://img.shields.io/badge/Status-Project_Work-orange?style=for-the-badge)
 
-Il presente elaborato illustra l'implementazione tecnica di un'architettura database relazionale progettata per supportare gli adempimenti normativi previsti dalla Direttiva UE 2022/2555 (**NIS2**) e dal **Framework Nazionale per la Cybersecurity (ACN)**.
+Il presente elaborato illustra l'implementazione tecnica di un'architettura database relazionale progettata per supportare gli adempimenti normativi previsti dalla Direttiva UE 2022/2555 (**NIS2**) e dal **Framework Nazionale per la Cybersecurity (CIS/CINI)**.
 
 Il progetto verte sulla realizzazione di un registro centralizzato per la gestione degli asset, dei servizi essenziali e delle dipendenze dalla catena di approvvigionamento (*Supply Chain*), integrando meccanismi di audit trail e funzionalità di reporting automatizzato.
 
@@ -53,12 +53,13 @@ Procedere alla clonazione, sul sistema di destinazione, del repository contenent
 
 ``` 
 git clone https://github.com/laverio078/SIGNIS_PW_2_19_031400314.git
-cd nis2-project-work
+cd SIGNIS_PW_2_19_031400314
 ```
 ---
 
 ### **2. Configurazione dell'ambiente target**
-Il file docker-compose.yml compose, presente nella directory SIGNIS_PW_2_19_031400314, contiene le variabili necessarie all'inizializzazione del database Postgres, dell'interfaccia di amministrazione pgAdmin e dell'interfaccia di gestione dello stack, Portainer.
+Il file docker-compose.yml compose, presente nella directory SIGNIS_PW_2_19_031400314, contiene le variabili necessarie all'inizializzazione del database Postgres, dell'interfaccia di amministrazione pgAdmin e dell'interfaccia di gestione dello stack, Portainer. 
+**ATTENZIONE**: è stata impostata una network specifica per il db server in modo da superare il limite del docker server nella gestione automatica delle network che su molte installazioni impedisce lo start. Se la network specificata non è compatibile o da errori, variarla a proprio piacimento.
 
 **Servizio PostgreSQL**
 
@@ -90,20 +91,20 @@ Interfaccia Portainer
 Posizionarsi nella directory SIGNIS_PW_2_19_031400314 ed eseguire il comando:
 
 ```
-docker compose up -d 
+sudo docker compose up -d 
 ```
 
 Questo comando avvierà il demone docker seguendo la configurazione descritta nel file docker-compose.yml.
 
-**Nota tecnica**: Durante la fase di avvio, il container PostgreSQL eseguirà automagicamente gli script SQL mappati nella directory `/docker-entrypoint-initdb.d/`, garantendo la creazione dello schema senza doverlo fare a posteriori. Qualora sia necessario far ripartire lo stack, senza cancellare i dati esistenti, si dovrà rimuovere dal `docker-file.yml` la riga numero 18, `- "./Creazione Schema-Tabelle-Costraints NIS2_v2.sql:/docker-entrypoint-initdb.d/init.sql"`
+**Nota tecnica**: Durante la fase di avvio, il container PostgreSQL eseguirà automagicamente gli script SQL mappati nella directory `/docker-entrypoint-initdb.d/`, garantendo la creazione dello schema senza doverlo fare a posteriori. Qualora sia necessario far ripartire lo stack, senza cancellare i dati esistenti, si dovrà rimuovere dal `docker-file.yml` la riga numero 18, `- "./Creazione Schema-Tabelle-Costraints NIS2_v2.sql:/docker-entrypoint-initdb.d/init.sql"` e la riga numero 19, `- "./Popolazione DB/0_popolazione_framework_acn.sql:/docker-entrypoint-initdb.d/02_framework.sql"` altrimenti il sistema cercherà di ricreare uno schema già esistente e ripopolare una tabella già riempita generando errori di conflitto per chiavi duplicate.
 
 Per disattivare lo stack rimuovendo tutti i dati esistenti sarà sufficiente eseguire il comando:
 
-    docker compose down -v
+    sudo docker compose down -v
 
 altrimenti sarà sufficiente il comando:
 
-    docker compose down
+    sudo docker compose down
 
 ## 🖥 **Interfacce di Amministrazione** 
 
@@ -111,13 +112,13 @@ L'accesso a quanto attivato dal sistema docker è garantito tramite le seguenti 
 
 ### Console database (pgAdmin 4)
 
- -    **Endpoint:** [http://0.0.0.0:5050]
+ -   **Endpoint:** [http://0.0.0.0:5050]
     
  -   **Credenziali di Accesso:** `admin@admin.com` / `root` #se non variate
     
  -   **Stato:** E' necessario configurare l'accesso al database locale dall'interfaccia web con i seguenti parametri nel tab connection della maschera Register - Server:
 
->  - **Host name/address**: `10.50.0.3` 
+>  - **Host name/address**: `db` 
 >  - **Username**: `admin`  (default)
 >  - **Password**: `admintest` (default)
 
@@ -139,7 +140,7 @@ Qualora si rendesse necessario un ripristino dello stato iniziale o un aggiornam
 
 1.  **Definizione Schema (DDL):** presente all'interno della root di progetto, quale file `Creazione Schema-Tabelle-Costraints NIS2_v2.sql`
     
-2.  **Data Ingestion (DML):** presenti all'interno della directory `queries/Popolazione DB` quali files `mock_data_anmss.sql` (Scenario simulato: Agenzia Nazionale Mobilità), `mock_data_autofisco.sql` (Scenario simulato: Auto Fisco Italia S.p.A.) 
+2.  **Data Ingestion (DML):** presenti all'interno della directory `queries/Popolazione DB` quali files `0_popolazione_framework_acn.sql` da eseguire prima di di caricare i mock data con i files `mock_data_anmss.sql` (Scenario simulato: Agenzia Nazionale Mobilità), `mock_data_autofisco.sql` (Scenario simulato: Auto Fisco Italia S.p.A.) 
     
 
 ### Estrazione Profilo ACN (CSV)
@@ -156,7 +157,7 @@ Il file generato, `report_acn_nis2.csv`, conterrà la mappatura completa di asse
 
 o eseguendo i file sql predisposti all'interno della directory `queries/Export CSV` con il comando:
 
-    docker run --rm   --network signis_pw_2_19_031400314_custom_nis2_net   -v "$(pwd):/workdir"   -w /workdir   -e PGPASSWORD=adminpassword   postgres:16-alpine   psql -h nis2_postgres -U admin -d postgres -f "*query_export.sql*"
+    sudo docker run --rm   --network signis_pw_2_19_031400314_custom_nis2_net   -v "$(pwd):/workdir"   -w /workdir   -e PGPASSWORD=adminpassword   postgres:16-alpine   psql -h nis2_postgres -U admin -d postgres -f "*query_export.sql*"
 
 Il file generato, `acn_profile_anmss.csv`, conterrà la mappatura completa di asset, servizi e fornitori per l'organizzazione ANMSS , mentre il file `acn_profile_AFI.csv`  conterrà quelli dell'AFI (Auto Fisco Italia).
 
@@ -164,21 +165,22 @@ Il file generato, `acn_profile_anmss.csv`, conterrà la mappatura completa di as
 
 E' possibile interrogare lo schema NIS2 del database PostgreSQL tramite interfaccia web (pgAdmin), strumento `Query Tool` o tramite client `psql` disponibile all'interno del container docker dell'RDBMS tramite il comando:
 
-    docker exec -it nis2_postgres psql -U admin -d postgres
+    sudo docker exec -it nis2_postgres psql -U admin -d postgres
     
-Per facilitare l'interrogazione dei dati sono state predisposte delle query precompilate presenti all'interno della directory `queries/Ricerca` e comprendono:
+Per facilitare l'interrogazione dei dati sono state predisposte delle query precompilate (numerate a 1 a 6) presenti all'interno della directory `queries/Ricerca` e comprendono:
 
  - Estrazione degli asset critici o ad alta criticità
  - Estrazione dell'elenco dei fornitori che supportano i servizi critici e il tipo di contratto in essere
  - Estrazione delle dipendenze della supply chain e dei fornitori per ogni servizio
  - Estrazione dei referenti interni (punti di contatto) per i vari servizi
  - Estrazione dello storico delle modifiche per un asset critico
+ - Estrazione del report di compliance ai controlli del framework CIS/CINI
 
 Per poterle eseguire, è possibile eseguire il client psql interno al container con il comando:
 
     docker exec -i nis2_postgres psql -U admin -d postgres < *query-file.sql*
 
-O tramite interfaccia **pgAdmin** copiando e incollando il contenuto del file scelto all'interno del `Query Tool` ed eseguendo la query.
+O tramite l'interfaccia **pgAdmin** copiando e incollando il contenuto del file scelto all'interno del `Query Tool` ed eseguendo la query scelta.
 
 ----------
 
@@ -200,12 +202,17 @@ L'organizzazione dei file all'interno del progetto rispetta la seguente tassonom
 │   ├── CELEX_32022L2555_IT_TXT.pdf
 │   ├── DetACN_nis_specifiche_2025_164179_allegato2.pdf
 │   ├── DetACN_nis_specifiche_2025_164179_signed.pdf
-│   └── Guida alla lettura Specifiche di base.pdf
+│   ├── FNCDP_-_Edizione_2025_v.2.1_-_Core.xls
+│   ├── Framework_nazionale_cybersecurity_data_protection.pdf
+│   ├── Guida alla lettura Specifiche di base.pdf
+│   ├── Linee guida ACN rafforzamento resilienza.pdf
+│   └── NIST.CSWP.29
 ├── queries
 │   ├── Export CSV
 │   │   ├── Query export in CSV_afi.sql
 │   │   └── Query export in CSV_anmss.sql
 │   ├── Popolazione DB
+│   │   ├── 0_popolazione_framework_acn.sql
 │   │   ├── mock_data_anmss.sql
 │   │   └── mock_data_autofisco.sql
 │   └── Ricerca
@@ -218,7 +225,9 @@ L'organizzazione dei file all'interno del progetto rispetta la seguente tassonom
 │       ├── 4_matrice_RACI.sql
 │       ├── 4_matrice_RACI_afi.sql
 │       ├── 5_estrazione_storico_asset.sql
-│       └── 5_estrazione_storico_asset_afi.sql
+│       ├── 5_estrazione_storico_asset_afi.sql
+│       ├── 6_report_compliance_nis2.sql
+│       └── 6_report_compliance_nis2_afi.sql
 └── README.md
 
 
