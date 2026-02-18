@@ -8,7 +8,7 @@
 
 Il presente elaborato illustra l'implementazione tecnica di un'architettura database relazionale progettata per supportare gli adempimenti normativi previsti dalla Direttiva UE 2022/2555 (**NIS2**) e dal **Framework Nazionale per la Cybersecurity (CIS/CINI)**.
 
-Il progetto verte sulla realizzazione di un registro centralizzato per la gestione degli asset, dei servizi essenziali e delle dipendenze dalla catena di approvvigionamento (*Supply Chain*), integrando meccanismi di audit trail e funzionalità di reporting automatizzato.
+Il progetto verte sulla realizzazione di un registro centralizzato per la gestione degli asset, dei servizi essenziali e delle dipendenze dalla catena di approvvigionamento (*Supply Chain*), integrando meccanismi di audit trail, verifica della compliance e funzionalità di reporting automatizzato.
 
 ## 📑 Sommario
 - [Quadro Architetturale](#-quadro-architetturale)
@@ -45,6 +45,18 @@ Per garantire la corretta esecuzione dell'ambiente simulato, il sistema ospite d
 ## 🚀 Istruzioni per il rilascio
 
 La procedura di installazione è stata automatizzata per ridurre al minimo le configurazioni manuali, tuttavia, qualora non si volesse impiegare il docker compose fornito, è possibile utilizzare una qualsiasi installazione di PostgreSQL (è stata impiegata la versione 16) e seguire le istruzioni per la costruzione dello schema di riferimento e del bulk loading sia delle tabelle di funzionamento (framework ACN) che dei mock data.
+
+Per la verifica del funzionamento di questo progetto, sfruttando lo stack docker attivato, è stata impiegata una VM Mint 22.3 vergine installata a partire dalla ISO fornita dal produttore all'interno del virtualizzatore VMWare Workstation. E' stato poi installato docker-ce seguendo le informazioni presenti al seguente link:
+
+https://docs.docker.com/engine/install/ubuntu/
+
+ed il client psql tramite il comando:
+
+> bash
+
+``` 
+sudo apt install postgresql-client
+```
 
 L'inizializzazione dell'ambiente segue il workflow descritto di seguito.
 
