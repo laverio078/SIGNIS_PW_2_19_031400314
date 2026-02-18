@@ -401,11 +401,13 @@ SELECT
           'security_controls', (
               SELECT jsonb_agg(jsonb_build_object(
                   'control_code', sp.subcategory_code,
+                  'control_description', sub.description,
                   'tier_current', sp.implementation_tier_current,
                   'status', sp.status_current,
                   'gap', sp.gap_analysis
               ))
               FROM security_profile sp
+              JOIN acn_subcategory sub ON sub.code = sp.subcategory_code
               WHERE sp.asset_id = a.asset_id
           )
       ))
@@ -420,15 +422,15 @@ JOIN service s ON s.organization_id = o.organization_id;
 /* Definizione della vista che produce un un record piatto esportabile in CSV */
 CREATE OR REPLACE VIEW vw_acn_profile_csv AS
 SELECT
-  o.name AS Organization,
-  s.name AS Service,
-  a.name AS Asset,
-  a.asset_type AS Asset_Type,
-  sp.subcategory_code AS ACN_Control_Code,
-  sub.description AS Control_Description,
-  sp.implementation_tier_current AS Current_Tier,
-  sp.status_current AS Status,
-  sp.gap_analysis AS Gap_To_Target
+  o.name AS organization_name,
+  s.name AS service_name,
+  a.name AS asset_name,
+  a.asset_type AS asset_type,
+  sp.subcategory_code AS acn_control_code,
+  sub.description AS control_description,
+  sp.implementation_tier_current AS current_tier,
+  sp.status_current AS status,
+  sp.gap_analysis AS gap_to_target
 FROM organization o
 JOIN service s ON s.organization_id = o.organization_id
 JOIN service_asset sa ON sa.service_id = s.service_id
