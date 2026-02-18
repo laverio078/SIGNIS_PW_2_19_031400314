@@ -197,7 +197,8 @@ Al fine di ottemperare agli obblighi di trasmissione dati previsti dall'Agenzia 
 > bash
 
 ```
-PGPASSWORD=adminpassword psql -h localhost -p 5432 -U admin -d postgres -c "\copy (SELECT * FROM nis2.vw_acn_profile_csv) TO 'report_acn_nis2.csv' WITH CSV HEADER DELIMITER ';'"
+cd "queries/Export CSV"
+PGPASSWORD=adminpassword psql -h localhost -p 5432 -U admin -d postgres < "*query_export.sql*"
 
 ```
 Il file generato, `report_acn_nis2.csv`, conterrà la mappatura completa di asset, servizi e fornitori per tutte le organizzazioni presenti.
@@ -209,17 +210,16 @@ Altrimenti è possibile utilizzare il client psql presente nel container docker 
 > bash
 
 ```
+cd "queries/Export CSV"
 sudo docker run --rm   --network signis_pw_2_19_031400314_custom_nis2_net   -v "$(pwd):/workdir"   -w /workdir   -e PGPASSWORD=adminpassword   postgres:16-alpine   psql -h nis2_postgres -U admin -d postgres -f "*query_export.sql*"
 ```
 
 Il file generato, `acn_profile_anmss.csv`, conterrà la mappatura completa di asset, servizi e fornitori per l'organizzazione ANMSS , mentre il file `acn_profile_AFI.csv` conterrà quelli dell'AFI (Auto Fisco Italia).
 
 
-
-
 ### Interrogazione dei dati.
 
-E' possibile interrogare lo schema NIS2 del database PostgreSQL tramite il client psql installato sulla propria macchina o con il client `psql` disponibile all'interno del container docker dell'RDBMS tramite i comandi:
+E' possibile interrogare lo schema NIS2 del database PostgreSQL presente nello stack docker tramite il client psql installato sulla propria macchina o con il client `psql` disponibile all'interno del container docker dell'RDBMS tramite i comandi:
 
 **psql**
 
@@ -270,6 +270,8 @@ sudo docker exec -i nis2_postgres psql -U admin -d postgres < *query-file.sql*
 ```
 
 O tramite l'interfaccia **pgAdmin** copiando e incollando il contenuto del file scelto all'interno del `Query Tool` ed eseguendo la query scelta.
+
+**NOTA:** Qualora sia stato utilizzato un server esterno per caricare i dati sarà necessario sostituire i riferimenti a utente, password, host, porta e database e adattarli a quanto presente nel proprio ambiente.
 
 ----------
 
