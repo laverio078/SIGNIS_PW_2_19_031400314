@@ -44,7 +44,9 @@ Per garantire la corretta esecuzione dell'ambiente simulato, il sistema ospite d
 
 ## 🚀 Istruzioni per il rilascio
 
-La procedura di installazione è stata automatizzata per ridurre al minimo le configurazioni manuali. L'inizializzazione dell'ambiente segue il workflow descritto di seguito.
+La procedura di installazione è stata automatizzata per ridurre al minimo le configurazioni manuali, tuttavia, qualora non si volesse impiegare il docker compose fornito, è possibile utilizzare una qualsiasi installazione di PostgreSQL (è stata impiegata la versione 16) e seguire le istruzioni per la costruzione dello schema di riferimento e del bulk loading sia delle tabelle di funzionamento (framework ACN) che dei mock data.
+
+L'inizializzazione dell'ambiente segue il workflow descritto di seguito.
 
 ### 1. Download  dei sorgenti
 Procedere alla clonazione, sul sistema di destinazione, del repository contenente gli artefatti di progetto con i seguenti comandi:
@@ -84,11 +86,20 @@ effettua un remap della porta 80 interna al container sulla 5050, pertanto se ne
 
 E' raccomandato variare le credenziali di accesso in ambienti di produzione, utilizzando password che rispecchino le best practices o le policy dell'ambiente di destinazione.
 
-Interfaccia Portainer
+**Interfaccia Portainer**
+
+effettua un remap della porta 9443 interna al container sulla 9443, pertanto se necessario modificare la riga seguente adattandola alle proprie necessità operative:
+
+    ports:
+      - "9443:9443"
+
+Al primo accesso sarà necessario impostare la password per l'utente admin (**attenzione** sono richiesti almeno 12 caratteri).
 
 ### **3. Esecuzione dello stack**
 
 Posizionarsi nella directory SIGNIS_PW_2_19_031400314 ed eseguire il comando:
+
+> bash
 
 ```
 sudo docker compose up -d 
@@ -100,11 +111,19 @@ Questo comando avvierà il demone docker seguendo la configurazione descritta ne
 
 Per disattivare lo stack rimuovendo tutti i dati esistenti sarà sufficiente eseguire il comando:
 
-    sudo docker compose down -v
+> bash
+
+```
+sudo docker compose down -v
+```
 
 altrimenti sarà sufficiente il comando:
 
-    sudo docker compose down
+> bash
+
+```
+sudo docker compose down
+```
 
 ## 🖥 **Interfacce di Amministrazione** 
 
@@ -144,7 +163,7 @@ Qualora si volesse impiegare un db server già presente, è possibile usare l'in
     
 2.  **Data Ingestion (DML):** presenti all'interno della directory `queries/Popolazione DB` quali files `0_popolazione_framework_acn.sql` da eseguire prima di di caricare i mock data.
 
-Bash
+> bash
 
 ```
 PGPASSWORD='<password>' psql -h <hostname> -p <port> -U <user> -d database -f Creazione_Schema-Tabelle-Costraints_NIS2_v2.sql
@@ -161,7 +180,7 @@ Il caricamento dei mock data non è stato previsto come automatico all'interno d
 
 I dati possono essere caricati all'interno dello stack docker tramite il client psql (da installare sulla propria macchina) come segue:
 
-Bash
+> bash
 
 ```
 PGPASSWORD='adminpassword' psql -h localhost -p 5432 -U admin -d postgres -f mock_data_autofisco.sql
@@ -174,7 +193,7 @@ qualora si voglia impiegare un server esterno sarà necessario sostituire i rife
 
 Al fine di ottemperare agli obblighi di trasmissione dati previsti dall'Agenzia per la Cybersicurezza Nazionale, è stata predisposta una vista dedicata (`vw_acn_profile_csv`). L'estrazione del report in formato interoperabile (CSV) può essere effettuata mediante il seguente comando:
 
-Bash
+> bash
 
 ```
 PGPASSWORD=adminpassword psql -h localhost -p 5432 -U admin -d postgres -c "\copy (SELECT * FROM nis2.vw_acn_profile_csv) TO 'report_acn_nis2.csv' WITH CSV HEADER DELIMITER ';'"
@@ -184,7 +203,11 @@ Il file generato, `report_acn_nis2.csv`, conterrà la mappatura completa di asse
 
 o eseguendo i file sql predisposti all'interno della directory `queries/Export CSV` con il comando:
 
+> bash
+
+```
     sudo docker run --rm   --network signis_pw_2_19_031400314_custom_nis2_net   -v "$(pwd):/workdir"   -w /workdir   -e PGPASSWORD=adminpassword   postgres:16-alpine   psql -h nis2_postgres -U admin -d postgres -f "*query_export.sql*"
+```
 
 Il file generato, `acn_profile_anmss.csv`, conterrà la mappatura completa di asset, servizi e fornitori per l'organizzazione ANMSS , mentre il file `acn_profile_AFI.csv`  conterrà quelli dell'AFI (Auto Fisco Italia).
 
@@ -196,7 +219,8 @@ Qualora sia stato utilizzato un server esterno per caricare i dati sarà necessa
 E' possibile interrogare lo schema NIS2 del database PostgreSQL tramite il client psql installato sulla propria macchina o con il client `psql` disponibile all'interno del container docker dell'RDBMS tramite i comandi:
 
 **psql**
-Bash
+
+> bash
 
 ```
 PGPASSWORD=adminpassword psql -h localhost -p 5432 -U admin -d postgres
@@ -205,10 +229,10 @@ PGPASSWORD=adminpassword psql -h localhost -p 5432 -U admin -d postgres
 
 **Docker**
 
-Bash
+> bash
 
 ```
-    sudo docker exec -it nis2_postgres psql -U admin -d postgres
+sudo docker exec -it nis2_postgres psql -U admin -d postgres
 
 ```
 
@@ -226,7 +250,8 @@ Per facilitare l'interrogazione dei dati sono state predisposte delle query prec
 Per poterle eseguire, è possibile eseguire il client psql sulla propria macchina o quello interno al container con i comandi:
 
 **psql**
-Bash
+
+> bash
 
 ```
 PGPASSWORD=adminpassword psql -h localhost -p 5432 -U admin -d postgres < *query-file.sql*
@@ -235,7 +260,7 @@ PGPASSWORD=adminpassword psql -h localhost -p 5432 -U admin -d postgres < *query
 
 **Docker**
 
-Bash
+> bash
 
 ```
     sudo docker exec -i nis2_postgres psql -U admin -d postgres < *query-file.sql*
