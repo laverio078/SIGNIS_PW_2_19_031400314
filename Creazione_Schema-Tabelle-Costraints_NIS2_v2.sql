@@ -77,7 +77,7 @@ CREATE TABLE asset (
     name varchar(40) NOT NULL,                                 /* nome dell'oggetto' */
     identifier varchar(40),                                    /* Identificatore specifico, per esempio tag, hostname, seriale */
     criticality SMALLINT DEFAULT 3,                     /* 1 (basso) .. 5 (critico), come predefinito si usa un valore intermedio, 3 */
-    lifecycle_status varchar(2DEFAULT 'active',             /* posizione nel ciclo di vita dell'oggetto, di default si usa active, gli altri valori validi possono essere: "off", "on hold", "decommissioned" */
+    lifecycle_status varchar(20) DEFAULT 'active',      /* posizione nel ciclo di vita dell'oggetto, di default si usa active, gli altri valori validi possono essere: "off", "on hold", "decommissioned" */
     metadata jsonb DEFAULT '{}'::jsonb,                 /* Eventuali metadati aggiuntivi specifici dell'oggetto, per esempio, riferimento all'uso che se ne fa */
     created_by UUID REFERENCES person(person_id),       /* Riferimento all'uuid del responsabile */
     created_at timestamptz DEFAULT now()                /* timestamp di definizione del record */
