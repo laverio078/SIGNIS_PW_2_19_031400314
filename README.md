@@ -136,12 +136,39 @@ Il sistema include procedure predefinite per la gestione del ciclo di vita del d
 
 ### Inizializzazione e Reset dei Dati
 
-Qualora si rendesse necessario un ripristino dello stato iniziale o un aggiornamento dello schema, si consiglia di utilizzare l'interfaccia a riga di comando `psql`. L'ordine di esecuzione degli script è vincolante:
+Qualora si rendesse necessario un ripristino dello stato iniziale o un aggiornamento dello schema, si consiglia di utilizzare i comandi docker per resettare l'ambiente già citati prima. 
 
-1.  **Definizione Schema (DDL):** presente all'interno della root di progetto, quale file `Creazione Schema-Tabelle-Costraints NIS2_v2.sql`
+Qualora si volesse impiegare un db server già presente, è possibile usare l'interfaccia a riga di comando `psql` seguendo l'ordine di esecuzione degli script (è vincolante) e cambiando i riferimenti:
+
+1.  **Definizione Schema (DDL):** presente all'interno della root di progetto, quale file `Creazione_Schema-Tabelle-Costraints_NIS2_v2.sql`
     
-2.  **Data Ingestion (DML):** presenti all'interno della directory `queries/Popolazione DB` quali files `0_popolazione_framework_acn.sql` da eseguire prima di di caricare i mock data con i files `mock_data_anmss.sql` (Scenario simulato: Agenzia Nazionale Mobilità), `mock_data_autofisco.sql` (Scenario simulato: Auto Fisco Italia S.p.A.) 
-    
+2.  **Data Ingestion (DML):** presenti all'interno della directory `queries/Popolazione DB` quali files `0_popolazione_framework_acn.sql` da eseguire prima di di caricare i mock data.
+
+Bash
+
+```
+PGPASSWORD='<password>' psql -h <hostname> -p <port> -U <user> -d database -f Creazione_Schema-Tabelle-Costraints_NIS2_v2.sql
+cd "queries/Popolazione DB"
+PGPASSWORD='<password>' psql -h <hostname> -p <port> -U <user> -d database -f  0_popolazione_framework_acn.sql
+
+```
+
+### Caricamento Mock data
+
+Il caricamento dei mock data non è stato previsto come automatico all'interno dello stack docker per favorire l'interazione da parte di chi esaminerà questo progetto.
+
+**Data Ingestion (DML):** sono presenti all'interno della directory `queries/Popolazione DB` quali files  `mock_data_anmss.sql` (Scenario simulato: Agenzia Nazionale Mobilità), `mock_data_autofisco.sql` (Scenario simulato: Auto Fisco Italia S.p.A.) 
+
+I dati possono essere caricati all'interno dello stack docker tramite il client psql (da installare sulla propria macchina) come segue:
+
+Bash
+
+```
+PGPASSWORD='adminpassword' psql -h localhost -p 5432 -U admin -d postgres -f mock_data_autofisco.sql
+PGPASSWORD='adminpassword' psql -h localhost -p 5432 -U admin -d postgres -f mock_data_anmss.sql
+
+```    
+qualora si voglia impiegare un server esterno sarà necessario sostituire i riferimenti a utente, password, host, porta e database e adattarli a quanto presente nel proprio ambiente.
 
 ### Estrazione Profilo ACN (CSV)
 
@@ -161,12 +188,32 @@ o eseguendo i file sql predisposti all'interno della directory `queries/Export C
 
 Il file generato, `acn_profile_anmss.csv`, conterrà la mappatura completa di asset, servizi e fornitori per l'organizzazione ANMSS , mentre il file `acn_profile_AFI.csv`  conterrà quelli dell'AFI (Auto Fisco Italia).
 
+Qualora sia stato utilizzato un server esterno per caricare i dati sarà necessario sostituire i riferimenti a utente, password, host, porta e database e adattarli a quanto presente nel proprio ambiente.
+
+
 ### Interrogazione dei dati.
 
-E' possibile interrogare lo schema NIS2 del database PostgreSQL tramite interfaccia web (pgAdmin), strumento `Query Tool` o tramite client `psql` disponibile all'interno del container docker dell'RDBMS tramite il comando:
+E' possibile interrogare lo schema NIS2 del database PostgreSQL tramite il client psql installato sulla propria macchina o con il client `psql` disponibile all'interno del container docker dell'RDBMS tramite i comandi:
 
+**psql**
+Bash
+
+```
+PGPASSWORD=adminpassword psql -h localhost -p 5432 -U admin -d postgres
+
+```
+
+**Docker**
+
+Bash
+
+```
     sudo docker exec -it nis2_postgres psql -U admin -d postgres
-    
+
+```
+
+o tramite l'interfaccia web (pgAdmin), strumento `Query Tool`.
+
 Per facilitare l'interrogazione dei dati sono state predisposte delle query precompilate (numerate a 1 a 6) presenti all'interno della directory `queries/Ricerca` e comprendono:
 
  - Estrazione degli asset critici o ad alta criticità
@@ -176,9 +223,23 @@ Per facilitare l'interrogazione dei dati sono state predisposte delle query prec
  - Estrazione dello storico delle modifiche per un asset critico
  - Estrazione del report di compliance ai controlli del framework CIS/CINI
 
-Per poterle eseguire, è possibile eseguire il client psql interno al container con il comando:
+Per poterle eseguire, è possibile eseguire il client psql sulla propria macchina o quello interno al container con i comandi:
 
-    docker exec -i nis2_postgres psql -U admin -d postgres < *query-file.sql*
+**psql**
+Bash
+
+```
+PGPASSWORD=adminpassword psql -h localhost -p 5432 -U admin -d postgres < *query-file.sql*
+
+```
+
+**Docker**
+
+Bash
+
+```
+    sudo docker exec -i nis2_postgres psql -U admin -d postgres < *query-file.sql*
+```
 
 O tramite l'interfaccia **pgAdmin** copiando e incollando il contenuto del file scelto all'interno del `Query Tool` ed eseguendo la query scelta.
 
