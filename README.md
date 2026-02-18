@@ -111,7 +111,7 @@ L'accesso a quanto attivato dal sistema docker è garantito tramite le seguenti 
 
 ### Console database (pgAdmin 4)
 
- -    **Endpoint:** [http://0.0.0.0:5050]
+ -   **Endpoint:** [http://0.0.0.0:5050]
     
  -   **Credenziali di Accesso:** `admin@admin.com` / `root` #se non variate
     
@@ -166,19 +166,20 @@ E' possibile interrogare lo schema NIS2 del database PostgreSQL tramite interfac
 
     docker exec -it nis2_postgres psql -U admin -d postgres
     
-Per facilitare l'interrogazione dei dati sono state predisposte delle query precompilate presenti all'interno della directory `queries/Ricerca` e comprendono:
+Per facilitare l'interrogazione dei dati sono state predisposte delle query precompilate (numerate a 1 a 6) presenti all'interno della directory `queries/Ricerca` e comprendono:
 
  - Estrazione degli asset critici o ad alta criticità
  - Estrazione dell'elenco dei fornitori che supportano i servizi critici e il tipo di contratto in essere
  - Estrazione delle dipendenze della supply chain e dei fornitori per ogni servizio
  - Estrazione dei referenti interni (punti di contatto) per i vari servizi
  - Estrazione dello storico delle modifiche per un asset critico
+ - Estrazione del report di compliance ai controlli del framework CIS/CINI
 
 Per poterle eseguire, è possibile eseguire il client psql interno al container con il comando:
 
     docker exec -i nis2_postgres psql -U admin -d postgres < *query-file.sql*
 
-O tramite interfaccia **pgAdmin** copiando e incollando il contenuto del file scelto all'interno del `Query Tool` ed eseguendo la query.
+O tramite l'interfaccia **pgAdmin** copiando e incollando il contenuto del file scelto all'interno del `Query Tool` ed eseguendo la query scelta.
 
 ----------
 
@@ -200,7 +201,11 @@ L'organizzazione dei file all'interno del progetto rispetta la seguente tassonom
 │   ├── CELEX_32022L2555_IT_TXT.pdf
 │   ├── DetACN_nis_specifiche_2025_164179_allegato2.pdf
 │   ├── DetACN_nis_specifiche_2025_164179_signed.pdf
-│   └── Guida alla lettura Specifiche di base.pdf
+│   ├── FNCDP_-_Edizione_2025_v.2.1_-_Core.xls
+│   ├── Framework_nazionale_cybersecurity_data_protection.pdf
+│   ├── Guida alla lettura Specifiche di base.pdf
+│   ├── Linee guida ACN rafforzamento resilienza.pdf
+│   └── NIST.CSWP.29
 ├── queries
 │   ├── Export CSV
 │   │   ├── Query export in CSV_afi.sql
