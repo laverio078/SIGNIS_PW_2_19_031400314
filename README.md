@@ -132,7 +132,7 @@ L'accesso a quanto attivato dal sistema docker è garantito tramite le seguenti 
 
 ### Console database (pgAdmin 4)
 
- -   **Endpoint:** [http://0.0.0.0:5050]
+ -   **Endpoint:** [http://localhost:5050]
     
  -   **Credenziali di Accesso:** `admin@admin.com` / `root` #se non variate
     
@@ -175,7 +175,7 @@ PGPASSWORD='<password>' psql -h <hostname> -p <port> -U <user> -d database -f  0
 
 ### Caricamento Mock data
 
-Il caricamento dei mock data non è stato previsto come automatico all'interno dello stack docker per favorire l'interazione da parte di chi esaminerà questo progetto.
+Il caricamento dei mock data **non** è stato previsto come automatico all'interno dello stack docker per favorire l'interazione da parte di chi esaminerà questo progetto.
 
 **Data Ingestion (DML):** sono presenti all'interno della directory `queries/Popolazione DB` quali files  `mock_data_anmss.sql` (Scenario simulato: Agenzia Nazionale Mobilità), `mock_data_autofisco.sql` (Scenario simulato: Auto Fisco Italia S.p.A.) 
 
