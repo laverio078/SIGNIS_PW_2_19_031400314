@@ -190,7 +190,7 @@ L'organizzazione dei file all'interno del progetto rispetta la seguente tassonom
 
 ```
 .
-├── Creazione Schema-Tabelle-Costraints NIS2_v2.sql
+├── Creazione_Schema-Tabelle-Costraints_NIS2_v2.sql
 ├── Diagramma ER DB profili NIS2.jpeg
 ├── Diagramma ER DB profili NIS2.pdf
 ├── docker-compose.yml
