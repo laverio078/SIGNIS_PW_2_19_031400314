@@ -15,7 +15,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       # Caricamento automatico dello schema all'avvio:
-      - "./Creazione Schema-Tabelle-Costraints NIS2_v2.sql:/docker-entrypoint-initdb.d/init.sql" #attenzione, rimuoverlo dopo il primo run
+      - "./Creazione Schema-Tabelle-Costraints NIS2_v2.sql:/docker-entrypoint-initdb.d/01_init.sql" #attenzione, rimuoverlo dopo il primo run
       - "./queries/Popolazione DB/0_popolazione_framework_acn.sql:/docker-entrypoint-initdb.d/02_framework.sql" #attenzione, rimuoverlo dopo il primo run
     networks:
       custom_nis2_net:
