@@ -58,7 +58,8 @@ cd SIGNIS_PW_2_19_031400314
 ---
 
 ### **2. Configurazione dell'ambiente target**
-Il file docker-compose.yml compose, presente nella directory SIGNIS_PW_2_19_031400314, contiene le variabili necessarie all'inizializzazione del database Postgres, dell'interfaccia di amministrazione pgAdmin e dell'interfaccia di gestione dello stack, Portainer.
+Il file docker-compose.yml compose, presente nella directory SIGNIS_PW_2_19_031400314, contiene le variabili necessarie all'inizializzazione del database Postgres, dell'interfaccia di amministrazione pgAdmin e dell'interfaccia di gestione dello stack, Portainer. 
+**ATTENZIONE**: è stata impostata una network specifica per il db server in modo da superare il limite del docker server nella gestione automatica delle network che su molte installazioni impedisce lo start. Se la network specificata non è compatibile o da errori, variarla a proprio piacimento.
 
 **Servizio PostgreSQL**
 
@@ -90,7 +91,7 @@ Interfaccia Portainer
 Posizionarsi nella directory SIGNIS_PW_2_19_031400314 ed eseguire il comando:
 
 ```
-docker compose up -d 
+sudo docker compose up -d 
 ```
 
 Questo comando avvierà il demone docker seguendo la configurazione descritta nel file docker-compose.yml.
@@ -99,11 +100,11 @@ Questo comando avvierà il demone docker seguendo la configurazione descritta ne
 
 Per disattivare lo stack rimuovendo tutti i dati esistenti sarà sufficiente eseguire il comando:
 
-    docker compose down -v
+    sudo docker compose down -v
 
 altrimenti sarà sufficiente il comando:
 
-    docker compose down
+    sudo docker compose down
 
 ## 🖥 **Interfacce di Amministrazione** 
 
@@ -117,7 +118,7 @@ L'accesso a quanto attivato dal sistema docker è garantito tramite le seguenti 
     
  -   **Stato:** E' necessario configurare l'accesso al database locale dall'interfaccia web con i seguenti parametri nel tab connection della maschera Register - Server:
 
->  - **Host name/address**: `10.50.0.3` 
+>  - **Host name/address**: `db` 
 >  - **Username**: `admin`  (default)
 >  - **Password**: `admintest` (default)
 
@@ -156,7 +157,7 @@ Il file generato, `report_acn_nis2.csv`, conterrà la mappatura completa di asse
 
 o eseguendo i file sql predisposti all'interno della directory `queries/Export CSV` con il comando:
 
-    docker run --rm   --network signis_pw_2_19_031400314_custom_nis2_net   -v "$(pwd):/workdir"   -w /workdir   -e PGPASSWORD=adminpassword   postgres:16-alpine   psql -h nis2_postgres -U admin -d postgres -f "*query_export.sql*"
+    sudo docker run --rm   --network signis_pw_2_19_031400314_custom_nis2_net   -v "$(pwd):/workdir"   -w /workdir   -e PGPASSWORD=adminpassword   postgres:16-alpine   psql -h nis2_postgres -U admin -d postgres -f "*query_export.sql*"
 
 Il file generato, `acn_profile_anmss.csv`, conterrà la mappatura completa di asset, servizi e fornitori per l'organizzazione ANMSS , mentre il file `acn_profile_AFI.csv`  conterrà quelli dell'AFI (Auto Fisco Italia).
 
@@ -164,7 +165,7 @@ Il file generato, `acn_profile_anmss.csv`, conterrà la mappatura completa di as
 
 E' possibile interrogare lo schema NIS2 del database PostgreSQL tramite interfaccia web (pgAdmin), strumento `Query Tool` o tramite client `psql` disponibile all'interno del container docker dell'RDBMS tramite il comando:
 
-    docker exec -it nis2_postgres psql -U admin -d postgres
+    sudo docker exec -it nis2_postgres psql -U admin -d postgres
     
 Per facilitare l'interrogazione dei dati sono state predisposte delle query precompilate (numerate a 1 a 6) presenti all'interno della directory `queries/Ricerca` e comprendono:
 
