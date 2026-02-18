@@ -95,7 +95,7 @@ docker compose up -d
 
 Questo comando avvierà il demone docker seguendo la configurazione descritta nel file docker-compose.yml.
 
-**Nota tecnica**: Durante la fase di avvio, il container PostgreSQL eseguirà automagicamente gli script SQL mappati nella directory `/docker-entrypoint-initdb.d/`, garantendo la creazione dello schema senza doverlo fare a posteriori. Qualora sia necessario far ripartire lo stack, senza cancellare i dati esistenti, si dovrà rimuovere dal `docker-file.yml` la riga numero 18, `- "./Creazione Schema-Tabelle-Costraints NIS2_v2.sql:/docker-entrypoint-initdb.d/init.sql"`
+**Nota tecnica**: Durante la fase di avvio, il container PostgreSQL eseguirà automagicamente gli script SQL mappati nella directory `/docker-entrypoint-initdb.d/`, garantendo la creazione dello schema senza doverlo fare a posteriori. Qualora sia necessario far ripartire lo stack, senza cancellare i dati esistenti, si dovrà rimuovere dal `docker-file.yml` la riga numero 18, `- "./Creazione Schema-Tabelle-Costraints NIS2_v2.sql:/docker-entrypoint-initdb.d/init.sql"` e la riga numero 19, `- "./Popolazione DB/0_popolazione_framework_acn.sql:/docker-entrypoint-initdb.d/02_framework.sql"` altrimenti il sistema cercherà di ricreare uno schema già esistente e ripopolare una tabella già riempita generando errori di conflitto per chiavi duplicate.
 
 Per disattivare lo stack rimuovendo tutti i dati esistenti sarà sufficiente eseguire il comando:
 
@@ -139,7 +139,7 @@ Qualora si rendesse necessario un ripristino dello stato iniziale o un aggiornam
 
 1.  **Definizione Schema (DDL):** presente all'interno della root di progetto, quale file `Creazione Schema-Tabelle-Costraints NIS2_v2.sql`
     
-2.  **Data Ingestion (DML):** presenti all'interno della directory `queries/Popolazione DB` quali files `mock_data_anmss.sql` (Scenario simulato: Agenzia Nazionale Mobilità), `mock_data_autofisco.sql` (Scenario simulato: Auto Fisco Italia S.p.A.) 
+2.  **Data Ingestion (DML):** presenti all'interno della directory `queries/Popolazione DB` quali files `0_popolazione_framework_acn.sql` da eseguire prima di di caricare i mock data con i files `mock_data_anmss.sql` (Scenario simulato: Agenzia Nazionale Mobilità), `mock_data_autofisco.sql` (Scenario simulato: Auto Fisco Italia S.p.A.) 
     
 
 ### Estrazione Profilo ACN (CSV)
@@ -206,6 +206,7 @@ L'organizzazione dei file all'interno del progetto rispetta la seguente tassonom
 │   │   ├── Query export in CSV_afi.sql
 │   │   └── Query export in CSV_anmss.sql
 │   ├── Popolazione DB
+│   │   ├── 0_popolazione_framework_acn.sql
 │   │   ├── mock_data_anmss.sql
 │   │   └── mock_data_autofisco.sql
 │   └── Ricerca
@@ -218,7 +219,9 @@ L'organizzazione dei file all'interno del progetto rispetta la seguente tassonom
 │       ├── 4_matrice_RACI.sql
 │       ├── 4_matrice_RACI_afi.sql
 │       ├── 5_estrazione_storico_asset.sql
-│       └── 5_estrazione_storico_asset_afi.sql
+│       ├── 5_estrazione_storico_asset_afi.sql
+│       ├── 6_report_compliance_nis2.sql
+│       └── 6_report_compliance_nis2_afi.sql
 └── README.md
 
 
