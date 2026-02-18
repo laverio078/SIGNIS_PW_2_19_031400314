@@ -158,7 +158,7 @@ Il sistema include procedure predefinite per la gestione del ciclo di vita del d
 
 Qualora si rendesse necessario un ripristino dello stato iniziale o un aggiornamento dello schema, si consiglia di utilizzare i comandi docker per resettare l'ambiente già citati prima. 
 
-Qualora si volesse impiegare un db server già presente, è possibile usare l'interfaccia a riga di comando `psql` seguendo l'ordine di esecuzione degli script (è vincolante) e cambiando i riferimenti:
+Qualora si volesse impiegare un db server già presente, è possibile usare l'interfaccia a riga di comando `psql` seguendo l'ordine di esecuzione degli script (è vincolante) e cambiando i riferimenti di accesso (hostname, port, user, password, database ):
 
 1.  **Definizione Schema (DDL):** presente all'interno della root di progetto, quale file `Creazione_Schema-Tabelle-Costraints_NIS2_v2.sql`
     
@@ -167,32 +167,32 @@ Qualora si volesse impiegare un db server già presente, è possibile usare l'in
 > bash
 
 ```
-PGPASSWORD='<password>' psql -h <hostname> -p <port> -U <user> -d database -f Creazione_Schema-Tabelle-Costraints_NIS2_v2.sql
+PGPASSWORD='<password>' psql -h <hostname> -p <port> -U <user> -d <database> -f Creazione_Schema-Tabelle-Costraints_NIS2_v2.sql
 cd "queries/Popolazione DB"
-PGPASSWORD='<password>' psql -h <hostname> -p <port> -U <user> -d database -f  0_popolazione_framework_acn.sql
+PGPASSWORD='<password>' psql -h <hostname> -p <port> -U <user> -d <database> -f  0_popolazione_framework_acn.sql
 
 ```
 
 ### Caricamento Mock data
 
-Il caricamento dei mock data **non** è stato previsto come automatico all'interno dello stack docker per favorire l'interazione da parte di chi esaminerà questo progetto.
+Il caricamento dei mock data è stato previsto come automatico all'interno dello stack docker da parte del docker compose, quindi se si impiega questo metodo, non sarà necessario interagire con il db per il caricamento, al contrario, se si preferisce usare un db server esterno è possibile caricare i dati come indicato di seguito.
 
 **Data Ingestion (DML):** sono presenti all'interno della directory `queries/Popolazione DB` quali files  `mock_data_anmss.sql` (Scenario simulato: Agenzia Nazionale Mobilità), `mock_data_autofisco.sql` (Scenario simulato: Auto Fisco Italia S.p.A.) 
 
-I dati possono essere caricati all'interno dello stack docker tramite il client psql (da installare sulla propria macchina) come segue:
+I dati possono essere caricati in Postgres tramite il client psql (da installare sulla propria macchina) come segue:
 
 > bash
 
 ```
-PGPASSWORD='adminpassword' psql -h localhost -p 5432 -U admin -d postgres -f mock_data_autofisco.sql
-PGPASSWORD='adminpassword' psql -h localhost -p 5432 -U admin -d postgres -f mock_data_anmss.sql
+PGPASSWORD='<password>' psql -h <hostname> -p <port> -U <user> -d <database> -f mock_data_autofisco.sql
+PGPASSWORD='<password>' psql -h <hostname> -p <port> -U <user> -d <database> -f mock_data_anmss.sql
 
 ```    
-qualora si voglia impiegare un server esterno sarà necessario sostituire i riferimenti a utente, password, host, porta e database e adattarli a quanto presente nel proprio ambiente.
+
 
 ### Estrazione Profilo ACN (CSV)
 
-Al fine di ottemperare agli obblighi di trasmissione dati previsti dall'Agenzia per la Cybersicurezza Nazionale, è stata predisposta una vista dedicata (`vw_acn_profile_csv`). L'estrazione del report in formato interoperabile (CSV) può essere effettuata mediante il seguente comando:
+Al fine di ottemperare agli obblighi di trasmissione dati previsti dall'Agenzia per la Cybersicurezza Nazionale, è stata predisposta una vista dedicata (`vw_acn_profile_csv`). L'estrazione del report in formato interoperabile (CSV), utilizzando quanto fornito nello stack docker, può essere effettuata mediante il seguente comando:
 
 > bash
 
@@ -202,17 +202,19 @@ PGPASSWORD=adminpassword psql -h localhost -p 5432 -U admin -d postgres -c "\cop
 ```
 Il file generato, `report_acn_nis2.csv`, conterrà la mappatura completa di asset, servizi e fornitori per tutte le organizzazioni presenti.
 
-o eseguendo i file sql predisposti all'interno della directory `queries/Export CSV` con il comando:
+Qualora sia stato utilizzato un server esterno per caricare i dati sarà necessario sostituire i riferimenti a utente, password, host, porta e database e adattarli a quanto presente nel proprio ambiente.
+
+Altrimenti è possibile utilizzare il client psql presente nel container docker eseguendo i file sql predisposti all'interno della directory `queries/Export CSV` con il comando:
 
 > bash
 
 ```
-    sudo docker run --rm   --network signis_pw_2_19_031400314_custom_nis2_net   -v "$(pwd):/workdir"   -w /workdir   -e PGPASSWORD=adminpassword   postgres:16-alpine   psql -h nis2_postgres -U admin -d postgres -f "*query_export.sql*"
+sudo docker run --rm   --network signis_pw_2_19_031400314_custom_nis2_net   -v "$(pwd):/workdir"   -w /workdir   -e PGPASSWORD=adminpassword   postgres:16-alpine   psql -h nis2_postgres -U admin -d postgres -f "*query_export.sql*"
 ```
 
-Il file generato, `acn_profile_anmss.csv`, conterrà la mappatura completa di asset, servizi e fornitori per l'organizzazione ANMSS , mentre il file `acn_profile_AFI.csv`  conterrà quelli dell'AFI (Auto Fisco Italia).
+Il file generato, `acn_profile_anmss.csv`, conterrà la mappatura completa di asset, servizi e fornitori per l'organizzazione ANMSS , mentre il file `acn_profile_AFI.csv` conterrà quelli dell'AFI (Auto Fisco Italia).
 
-Qualora sia stato utilizzato un server esterno per caricare i dati sarà necessario sostituire i riferimenti a utente, password, host, porta e database e adattarli a quanto presente nel proprio ambiente.
+
 
 
 ### Interrogazione dei dati.

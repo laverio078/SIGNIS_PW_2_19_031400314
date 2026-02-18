@@ -17,6 +17,8 @@ services:
       # Caricamento automatico dello schema all'avvio:
       - "./Creazione_Schema-Tabelle-Costraints_NIS2_v2.sql:/docker-entrypoint-initdb.d/01_init.sql" #attenzione, rimuoverlo dopo il primo run
       - "./queries/Popolazione DB/0_popolazione_framework_acn.sql:/docker-entrypoint-initdb.d/02_framework.sql" #attenzione, rimuoverlo dopo il primo run
+      - "./queries/Popolazione DB/mock_data_anmss.sql:/docker-entrypoint-initdb.d/03_mock_data_anmss.sql"
+      - "./queries/Popolazione DB/mock_data_autofisco.sql:/docker-entrypoint-initdb.d/03_mock_data_autofisco.sql"
     networks:
       custom_nis2_net:
         ipv4_address: 10.50.0.3 # Assegna questo IP specifico
