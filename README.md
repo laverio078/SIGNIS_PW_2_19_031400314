@@ -299,7 +299,7 @@ O tramite l'interfaccia **pgAdmin** copiando e incollando il contenuto del file 
 
 ## 🌟 Progetto Bonus: Web Application SIGNIS (Interfaccia CRUD)
 
-A corredo del presente elaborato, e concepito come **progetto extra** rispetto ai requisiti base del Project Work, è stata sviluppata un'interfaccia web dedicata alla gestione semplificata dei dati. 
+A corredo del presente elaborato, e concepito come **progetto extra** rispetto ai requisiti base del Project Work, è stata sviluppata un'interfaccia web in Python Flask e Bootstrap 5 dedicata alla gestione semplificata dei dati. 
 
 Poiché l'interazione diretta tramite riga di comando o client SQL (come `psql` o pgAdmin) può risultare complessa per l'utente finale preposto alla compilazione dei registri NIS2 in ambito aziendale, la WebApp fornisce un frontend intuitivo (CRUD) per:
 - Censire e modificare agilmente Organizzazioni, Personale (Punti di Contatto) e Fornitori.
@@ -307,11 +307,10 @@ Poiché l'interazione diretta tramite riga di comando o client SQL (come `psql` 
 - Tracciare le dipendenze della Supply Chain.
 - Valutare e registrare la compliance rispetto al framework ACN/NIST (Gap Analysis e Tiering).
 
-L'applicazione è sviluppata in **Python (Flask)** con interfaccia in **Bootstrap 5** ed è dotata di una suite completa di Unit Test (copertura totale delle operazioni CRUD tramite database mocking). 
 
 🔗 **Repository della WebApp:** [https://github.com/laverio078/webapp-signis](https://github.com/laverio078/webapp-signis)
 
-*(Nota Operativa: L'applicazione web è progettata per interfacciarsi con il database PostgreSQL rilasciato in questo repository. Pertanto, per il suo corretto funzionamento, è necessario che l'infrastruttura Docker descritta nei capitoli precedenti sia preventivamente avviata).*
+*(Nota Operativa: L'applicazione web è progettata per interfacciarsi con il database PostgreSQL rilasciato in questo repository. Per il suo corretto funzionamento è necessario che l'infrastruttura Docker sia stata preventivamente avviata).*
 
 ----------
 
