@@ -299,9 +299,9 @@ O tramite l'interfaccia **pgAdmin** copiando e incollando il contenuto del file 
 
 ## 🌟 Progetto Bonus: Web Application SIGNIS (Interfaccia CRUD)
 
-A corredo del presente elaborato, e concepito come **progetto extra** rispetto ai requisiti base del Project Work, è stata sviluppata un'interfaccia web in Python Flask e Bootstrap 5 dedicata alla gestione semplificata dei dati. 
+A corredo di questo elaborato, e concepito come **progetto extra** rispetto ai requisiti base del Project Work, è stata sviluppata un'interfaccia web in Python Flask e Bootstrap 5 dedicata alla gestione semplificata dei dati. 
 
-Poiché l'interazione diretta tramite riga di comando o client SQL (come `psql` o pgAdmin) può risultare complessa per l'utente finale preposto alla compilazione dei registri NIS2 in ambito aziendale, la WebApp fornisce un frontend intuitivo (CRUD) per:
+Poiché l'interazione diretta tramite riga di comando o client SQL (come `psql` o pgAdmin) può risultare molto antipatica per l'utente finale preposto alla compilazione dei registri NIS2 in ambito aziendale, la WebApp fornisce un frontend intuitivo (CRUD) per:
 - Censire e modificare agilmente Organizzazioni, Personale (Punti di Contatto) e Fornitori.
 - Mappare graficamente le relazioni tra Servizi Essenziali e Asset.
 - Tracciare le dipendenze della Supply Chain.
