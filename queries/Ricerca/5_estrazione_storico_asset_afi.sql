@@ -1,8 +1,8 @@
 SET search_path = nis2, public;
-/* 5) Estrazione  dello storico modifiche (Audit Trail) per l'asset critico 'Thales HSM Payment' (sistema di firma) */
-/* Verifica le modifiche avvenute su un asset specifico (es. il Database Veicoli). */
+/* Estrazione  dello storico modifiche (Audit Trail) per l'asset critico 'Thales HSM Payment' (sistema di firma) */
+/* Verifica le modifiche avvenute su un asset specifico (es. il Thales HSM Payment). */
 /* Nota: Questa query restituirà risultati solo dopo aver effettuato modifiche (UPDATE) sull'asset */
-/* pertanto si  è deciso di inserire una update prima dell'estrazione che mette in 'on-hold' l'asset da 'active' */
+/* pertanto è stata inserita una update prima dell'estrazione che mette in 'on-hold' l'asset da 'active' */
 UPDATE asset
 SET lifecycle_status = 'on hold'
 WHERE identifier = 'HSM-PAY-SEC-01'
