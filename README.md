@@ -16,6 +16,7 @@ Il progetto verte sulla realizzazione di un registro centralizzato per la gestio
 - [Metodologia di Deployment](#-metodologia-di-deployment)
 - [Interfacce di Amministrazione](#-interfacce-di-amministrazione)
 - [Gestione Dati e Reporting](#-gestione-dati-e-reporting)
+- [Progetto Bonus: Web Application SIGNIS (Interfaccia CRUD)](#-progetto-bonus-web-application-signis-interfaccia-crud)
 - [Struttura dell'Elaborato](#-struttura-dellelaborato)
 
 ---
