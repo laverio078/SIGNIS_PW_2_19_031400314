@@ -120,7 +120,7 @@ sudo docker compose up -d
 
 Questo comando avvierà il demone docker seguendo la configurazione descritta nel file docker-compose.yml.
 
-**Nota tecnica**: Durante la fase di avvio, il container PostgreSQL eseguirà automagicamente gli script SQL mappati nella directory `/docker-entrypoint-initdb.d/`, garantendo la creazione dello schema senza doverlo fare a posteriori. Qualora sia necessario far ripartire lo stack, senza cancellare i dati esistenti, si dovrà rimuovere dal `docker-file.yml` la riga numero 18, `- "./Creazione Schema-Tabelle-Costraints NIS2_v2.sql:/docker-entrypoint-initdb.d/init.sql"`, la riga numero 19, `- "./Popolazione DB/0_popolazione_framework_acn.sql:/docker-entrypoint-initdb.d/02_framework.sql"`, la riga numero 20 `"./queries/Popolazione DB/mock_data_anmss.sql:/docker-entrypoint-initdb.d/03_mock_data_anmss.sql"` e la 21 `"./queries/Popolazione DB/mock_data_autofisco.sql:/docker-entrypoint-initdb.d/03_mock_data_autofisco.sql"` altrimenti il sistema cercherà di ricreare uno schema già esistente e ripopolare una tabella già riempita generando errori di conflitto per chiavi duplicate.
+**Nota tecnica**: Durante la fase di avvio, il container PostgreSQL eseguirà automagicamente gli script SQL mappati nella directory `/docker-entrypoint-initdb.d/`, garantendo la creazione dello schema senza doverlo fare a posteriori. Qualora sia necessario far ripartire lo stack, senza cancellare i dati esistenti, si dovrà rimuovere dal `docker-file.yml` la riga numero 18, `- "./Creazione_Schema-Tabelle-Costraints_NIS2_v2.sql:/docker-entrypoint-initdb.d/init.sql"`, la riga numero 19, `- "./Popolazione DB/0_popolazione_framework_acn.sql:/docker-entrypoint-initdb.d/02_framework.sql"`, la riga numero 20 `"./queries/Popolazione DB/mock_data_anmss.sql:/docker-entrypoint-initdb.d/03_mock_data_anmss.sql"` e la 21 `"./queries/Popolazione DB/mock_data_autofisco.sql:/docker-entrypoint-initdb.d/03_mock_data_autofisco.sql"` altrimenti il sistema cercherà di ricreare uno schema già esistente e ripopolare una tabella già riempita generando errori di conflitto per chiavi duplicate.
 
 Per disattivare lo stack rimuovendo tutti i dati esistenti sarà sufficiente eseguire il comando:
 
@@ -152,7 +152,7 @@ L'accesso a quanto attivato dal sistema docker è garantito tramite le seguenti 
 
 >  - **Host name/address**: `db` 
 >  - **Username**: `admin`  (default)
->  - **Password**: `admintest` (default)
+>  - **Password**: `adminpassword` (default)
 
 Inserendo le credenziali fornite in fase di setup.
 
@@ -226,6 +226,16 @@ cd "queries/Export CSV"
 sudo docker run --rm   --network signis_pw_2_19_031400314_custom_nis2_net   -v "$(pwd):/workdir"   -w /workdir   -e PGPASSWORD=adminpassword   postgres:16-alpine   psql -h nis2_postgres -U admin -d postgres -f "*query_export.sql*"
 ```
 
+**ATTENZIONE**: **se** il progetto è stato fatto partire da una cartella rinominata e non da quella creata dal git clone, sarà necessario verificare quale nome abbia assunto la network dello stack con il comando:
+
+> bash
+
+```
+docker network ls
+```
+
+e sostituire il nome riportato dopo --network del comando "docker run".
+
 Il file generato, `acn_profile_anmss.csv`, conterrà la mappatura completa di asset, servizi e fornitori per l'organizzazione ANMSS , mentre il file `acn_profile_AFI.csv` conterrà quelli dell'AFI (Auto Fisco Italia).
 
 
@@ -284,6 +294,24 @@ sudo docker exec -i nis2_postgres psql -U admin -d postgres < *query-file.sql*
 O tramite l'interfaccia **pgAdmin** copiando e incollando il contenuto del file scelto all'interno del `Query Tool` ed eseguendo la query scelta.
 
 **NOTA:** Qualora sia stato utilizzato un server esterno per caricare i dati sarà necessario sostituire i riferimenti a utente, password, host, porta e database e adattarli a quanto presente nel proprio ambiente.
+
+----------
+
+## 🌟 Progetto Bonus: Web Application SIGNIS (Interfaccia CRUD)
+
+A corredo del presente elaborato, e concepito come **progetto extra** rispetto ai requisiti base del Project Work, è stata sviluppata un'interfaccia web dedicata alla gestione semplificata dei dati. 
+
+Poiché l'interazione diretta tramite riga di comando o client SQL (come `psql` o pgAdmin) può risultare complessa per l'utente finale preposto alla compilazione dei registri NIS2 in ambito aziendale, la WebApp fornisce un frontend intuitivo (CRUD) per:
+- Censire e modificare agilmente Organizzazioni, Personale (Punti di Contatto) e Fornitori.
+- Mappare graficamente le relazioni tra Servizi Essenziali e Asset.
+- Tracciare le dipendenze della Supply Chain.
+- Valutare e registrare la compliance rispetto al framework ACN/NIST (Gap Analysis e Tiering).
+
+L'applicazione è sviluppata in **Python (Flask)** con interfaccia in **Bootstrap 5** ed è dotata di una suite completa di Unit Test (copertura totale delle operazioni CRUD tramite database mocking). 
+
+🔗 **Repository della WebApp:** [https://github.com/laverio078/webapp-signis](https://github.com/laverio078/webapp-signis)
+
+*(Nota Operativa: L'applicazione web è progettata per interfacciarsi con il database PostgreSQL rilasciato in questo repository. Pertanto, per il suo corretto funzionamento, è necessario che l'infrastruttura Docker descritta nei capitoli precedenti sia preventivamente avviata).*
 
 ----------
 
