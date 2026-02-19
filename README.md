@@ -2,6 +2,7 @@
 
 # Prototipazione del Sistema di gestione integrata per i profili NIS2 (SIGNIS)
 
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/farruggiov/)
 ![PostgreSQL](https://img.shields.io/badge/DBMS-PostgreSQL_16-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Orchestrator-Docker_Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Status](https://img.shields.io/badge/Status-Project_Work-orange?style=for-the-badge)
