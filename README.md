@@ -6,6 +6,7 @@
 ![PostgreSQL](https://img.shields.io/badge/DBMS-PostgreSQL_16-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Orchestrator-Docker_Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Status](https://img.shields.io/badge/Status-Project_Work-orange?style=for-the-badge)
+![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
 
 Il presente elaborato illustra l'implementazione tecnica di un'architettura database relazionale progettata per supportare gli adempimenti normativi previsti dalla Direttiva UE 2022/2555 (**NIS2**) e dal **Framework Nazionale per la Cybersecurity (CIS/CINI)**.
 
@@ -364,3 +365,9 @@ L'organizzazione dei file all'interno del progetto rispetta la seguente tassonom
 
 
 ```
+
+## 📄 Licenza
+
+Questo progetto è distribuito sotto licenza **GNU General Public License v3.0 (GPL-3.0)**.
+Sei libero di usare, studiare, condividere e modificare il software. Qualsiasi progetto derivato dovrà essere distribuito sotto la medesima licenza. 
+Per i dettagli completi, consulta il file [LICENSE](LICENSE) presente nella root del repository.
