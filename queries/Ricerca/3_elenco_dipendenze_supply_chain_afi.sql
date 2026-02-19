@@ -1,5 +1,5 @@
 SET search_path = nis2, public;
-/* 3) Elenco dipendenze Supply Chain e Fornitori per servizio */
+/* Elenco dipendenze Supply Chain e Fornitori per servizio */
 SELECT d.dependency_id, s.name AS service_name, v.name AS vendor_name, d.dependency_type, d.sla_reference, d.criticality
 FROM dependency d
 JOIN service s ON s.service_id = d.service_id

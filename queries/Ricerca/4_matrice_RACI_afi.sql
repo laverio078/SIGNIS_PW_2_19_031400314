@@ -1,6 +1,6 @@
 SET search_path = nis2, public;
 
-/* 4) Matrice RACI */
+/* Matrice RACI */
 SELECT 
     s.name AS service_name,
     r.code AS role_code,

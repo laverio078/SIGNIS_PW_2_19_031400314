@@ -1,6 +1,6 @@
 SET search_path = nis2, public;
 
-/* 2) Elenco servizi critici (Asset e Fornitori) */
+/* Elenco servizi critici (Asset e Fornitori) */
 SELECT 
     s.name AS service_name,
     s.criticality AS service_criticality,
